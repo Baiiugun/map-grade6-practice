@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-NOkNyJxN2cBdjwr8RwdYpbm9T0WF8FBrbkTRQZkywtU=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-Sm2Ni7igcCM2xnySI1MiI/iT16t8vjEePjnEueZS68c=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
   <meta name="referrer" content="no-referrer">
-  <link rel="stylesheet" href="cloud.css">
-  <title>MAP Grade 6 作答记录 · 老师登录版本</title>
+  <link rel="stylesheet" href="cloud.css?v=02e1bbf6dfc3">
+  <title>MAP 作答记录 · 老师登录版本</title>
   <style>:root {
   color-scheme: light;
   font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
@@ -224,7 +224,7 @@ h1 { margin: 0; font-size: clamp(22px, 2.5vw, 31px); font-weight: 750; letter-sp
         <path d="M12 11h15a2 2 0 0 1 2 2v16H14a3 3 0 0 1-3-3V12a1 1 0 0 1 1-1Z" fill="none" stroke="white" stroke-width="1.7"/>
         <path d="M11 25h18M16 16h8M16 20h6" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
       </svg>
-      <span class="brand-name">MAP Grade 6 作答与讲义</span>
+      <span class="brand-name">MAP 作答与讲义</span>
       <span class="bank-total" id="bank-total"></span>
     </div>
   </header>
@@ -253,7 +253,7 @@ h1 { margin: 0; font-size: clamp(22px, 2.5vw, 31px); font-weight: 750; letter-sp
         <details id="import-bank">
           <summary id="import-summary">题库导入</summary>
           <form id="import-form" class="map-form">
-            <label>选择 MAP_本地练习_老师版.html <input id="bank-file" type="file" accept=".html,text/html" required></label>
+            <label>选择要导入的 MAP 本地老师版 HTML <input id="bank-file" type="file" accept=".html,text/html" required></label>
             <button class="map-button map-primary" id="import-button" type="submit">导入 Supabase</button>
           </form>
           <p id="import-status" class="map-status" role="status"></p>
@@ -281,8 +281,11 @@ h1 { margin: 0; font-size: clamp(22px, 2.5vw, 31px); font-weight: 750; letter-sp
         <button class="map-button" id="clear-attempt">返回纯讲义</button>
       </section>
       <div id="teacher-worksheet" hidden>
+        <section class="map-card map-toolbar">
+          <label>讲义年级 <select id="worksheet-grade"></select></label>
+        </section>
         <p id="worksheet-status" class="map-status" role="status"></p>
-    <section class="picker" aria-label="选择原卷">
+    <section class="picker" id="worksheet-filters" aria-label="选择原卷">
       <div class="picker-row">
         <span class="picker-label" id="subject-label">科目</span>
         <div class="tabs" id="subject-tabs" role="tablist" aria-labelledby="subject-label"></div>
@@ -343,8 +346,8 @@ h1 { margin: 0; font-size: clamp(22px, 2.5vw, 31px); font-weight: 750; letter-sp
 
   <noscript><p>请在允许 JavaScript 的浏览器中打开此讲义。</p></noscript>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.89.0/dist/umd/supabase.js" integrity="sha384-sddcMIX7Ar6auuLM3TihDPYO6uOeMYsjtmZKfi8V83eeqdFWdnpAtk90odEwbXjh" crossorigin="anonymous"></script>
-  <script src="cloud.js"></script>
-  <script src="teacher-cloud.js"></script>
+  <script src="cloud.js?v=07b0eb7a44f7"></script>
+  <script src="teacher-cloud.js?v=ddf953d820ab"></script>
   <script>"use strict";
 const MAP_CONFIG = {"url": "https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiZXhwIjozNjg2OTI1NzYzfQ.y45vSsbxFjV9k-psYujSR2YMtDOeZW_IDZS6eBlbRFc"};
 function startMapWorksheet(bank, loadPaper, overlay, onPaperChange) {
@@ -353,7 +356,7 @@ function startMapWorksheet(bank, loadPaper, overlay, onPaperChange) {
 const papers = new Map(bank.papers.map(paper => [paper.id, paper]));
 const get = id => document.getElementById(id);
 const levelOrder = ["Basic", "Proficient", "Advanced"];
-let defaultPaper = papers.get("language:g06-language-usage-basic-grammar-and-usage-quiz-02") || bank.papers[0];
+const defaultPaper = papers.get("language:g06-language-usage-basic-grammar-and-usage-quiz-02") || bank.papers[0];
 const termLabels = { focus: "考点", original: "原句待改", revision: "建议写法" };
 let activePaper = papers.get(location.hash.slice(1)) || defaultPaper;
 
@@ -540,18 +543,30 @@ function renderWorksheet(paper) {
 }
 
 function render() {
+  get("worksheet-grade").value = selectedGrade;
+  get("worksheet-filters").hidden = !activePaper;
+  get("paper-panel").hidden = !activePaper;
+  get("share-paper").disabled = !activePaper;
+  if (!activePaper) {
+    loading += 1;
+    renderedPaper = null;
+    get("worksheet-rows").replaceChildren();
+    get("worksheet-status").textContent = "Grade " + selectedGrade + " 尚未导入题库。";
+    return;
+  }
+  const gradePapers = bank.papers.filter(paper => String(paper.grade) === selectedGrade);
   const subject = activePaper.subject;
   const level = activePaper.difficulty;
-  const subjects = [...new Set(bank.papers.map(paper => paper.subject))];
+  const subjects = [...new Set(gradePapers.map(paper => paper.subject))];
   renderTabs(
     get("subject-tabs"), subjects.map(value => ({ value, label: value })), subject,
     (value, tabs) => activate(
-      bank.papers.find(paper => paper.subject === value && paper.difficulty === level)
-        || bank.papers.find(paper => paper.subject === value),
+      gradePapers.find(paper => paper.subject === value && paper.difficulty === level)
+        || gradePapers.find(paper => paper.subject === value),
       tabs,
     ),
   );
-  const inSubject = bank.papers.filter(paper => paper.subject === subject);
+  const inSubject = gradePapers.filter(paper => paper.subject === subject);
   const levels = levelOrder.filter(value => inSubject.some(paper => paper.difficulty === value));
   renderTabs(get("level-tabs"), levels.map(value => ({ value, label: value })), level, (value, tabs) => {
     activate(inSubject.find(paper => paper.difficulty === value), tabs);
@@ -569,17 +584,19 @@ function render() {
   showWorksheet(activePaper.id);
 }
 
-window.addEventListener("hashchange", () => {
-  const paper = papers.get(location.hash.slice(1)) || defaultPaper;
-  if (paper.id !== activePaper.id) {
-    onPaperChange();
-    activePaper = paper;
-    render();
-  }
-});
 
 let renderedPaper = null;
 let loading = 0;
+let selectedGrade = String(activePaper.grade);
+
+function selectGrade(grade) {
+  selectedGrade = grade;
+  activePaper = bank.papers.find(paper => String(paper.grade) === grade) || null;
+  onPaperChange();
+  if (activePaper) location.hash = activePaper.id;
+  else history.replaceState(null, "", location.pathname + location.search);
+  render();
+}
 
 function refreshOverlay() {
   for (const question of renderedPaper?.questions || []) {
@@ -613,22 +630,33 @@ function setCatalog(catalog) {
   bank.papers = catalog;
   papers.clear();
   for (const paper of catalog) papers.set(paper.id, paper);
-  defaultPaper = papers.get(defaultPaper.id) || catalog[0];
-  activePaper = papers.get(activePaper.id) || defaultPaper;
+  activePaper = papers.get(activePaper?.id)
+    || catalog.find(paper => String(paper.grade) === selectedGrade) || null;
+  get("worksheet-grade").replaceChildren(...mapGradeOptions(catalog).map(([value, label]) => new Option(label, value)));
   get("bank-total").textContent = catalog.length + " 份原卷 · "
     + catalog.reduce((sum, paper) => sum + paper.questions.length, 0) + " 道题";
   render();
 }
 
+get("worksheet-grade").onchange = event => selectGrade(event.target.value);
+window.addEventListener("hashchange", () => {
+  const paper = papers.get(location.hash.slice(1));
+  if (!paper || paper.id === activePaper?.id) return;
+  onPaperChange();
+  activePaper = paper;
+  selectedGrade = String(paper.grade);
+  render();
+});
 setCatalog(bank.papers);
 return {
   refreshOverlay,
   setCatalog,
-  activeId: () => activePaper.id,
+  activeId: () => activePaper?.id,
   open(id) {
     const paper = papers.get(id);
-    if (!paper || id === activePaper.id) return;
+    if (!paper || id === activePaper?.id) return;
     activePaper = paper;
+    selectedGrade = String(paper.grade);
     location.hash = paper.id;
     render();
   },

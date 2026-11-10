@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-QgyYa5DHWHKh0YLA0hnk6H5tjFTZDHe+k/9lHKMLUoc=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-+DnAtiuUiAlMLpJbTqrK6viB/yLtBjqwYCCfegLzuEc=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
   <meta name="referrer" content="no-referrer">
-  <link rel="stylesheet" href="cloud.css">
-  <title>MAP Grade 6 在线练习</title>
+  <link rel="stylesheet" href="cloud.css?v=02e1bbf6dfc3">
+  <title>MAP 在线练习</title>
   <style>:root {
   color-scheme: light;
   --ink: #172e45;
@@ -390,7 +390,7 @@ dialog p { color: var(--muted); line-height: 1.6; }
           <path d="M12 11h15a2 2 0 0 1 2 2v16H14a3 3 0 0 1-3-3V12a1 1 0 0 1 1-1Z" fill="none" stroke="white" stroke-width="1.7"/>
           <path d="M11 25h18M16 16h8M16 20h6" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
         </svg>
-        <span>MAP Grade 6 在线练习</span>
+        <span>MAP 在线练习</span>
       </button>
       <span class="edition" id="edition"></span>
       <nav id="student-controls" class="site-nav" aria-label="主要导航" hidden>
@@ -402,10 +402,11 @@ dialog p { color: var(--muted); line-height: 1.6; }
   <main>
 
     <section id="join-view" class="map-card map-gate" aria-labelledby="join-title">
-      <p class="kicker">MAP GRADE 6</p>
+      <p class="kicker">MAP · GRADE 1–12</p>
       <h1 id="join-title">进入在线练习</h1>
-      <p class="map-muted">使用老师发来的链接或班级码，填写姓名拼音缩写即可开始。</p>
+      <p class="map-muted">选择年级后，使用老师发来的链接或班级码进入题库。</p>
       <form id="join-form" class="map-form">
+        <label>年级 <select id="join-grade"><option value="">进入题库后再选</option></select></label>
         <label>姓名拼音缩写 <input id="student-name" maxlength="16" placeholder="例如 HQ" autocapitalize="characters" required></label>
         <label>班级码 <input id="class-code" maxlength="36" autocomplete="off" spellcheck="false" required></label>
         <button class="map-button map-primary" id="join-button" type="submit">进入题库</button>
@@ -421,15 +422,15 @@ dialog p { color: var(--muted); line-height: 1.6; }
         <div>
           <p class="kicker">MAP PRACTICE</p>
           <h1 id="setup-title">选择练习</h1>
-          <p class="subtitle">按科目、年级和难度，找到要练习的原卷。</p>
+          <p class="subtitle">先选年级，再按科目和难度选择原卷。</p>
         </div>
         <p id="bank-total" class="bank-total"></p>
       </div>
       <form id="setup-form" class="panel setup-panel">
         <h2>练习范围</h2>
         <div class="filters">
-          <label><span><b>01</b> 科目</span><select id="subject"></select></label>
-          <label><span><b>02</b> 年级</span><select id="grade"></select></label>
+          <label><span><b>01</b> 年级</span><select id="grade"></select></label>
+          <label><span><b>02</b> 科目</span><select id="subject"></select></label>
           <label><span><b>03</b> 难度</span><select id="difficulty"></select></label>
           <label class="paper-field"><span><b>04</b> Quiz 或 Test</span><select id="paper"></select></label>
         </div>
@@ -523,11 +524,11 @@ dialog p { color: var(--muted); line-height: 1.6; }
     </form>
   </dialog>
   <noscript><p class="storage-notice">请在允许 JavaScript 的浏览器中打开此文件。</p></noscript>
-  <script src="cloud.js"></script>
-  <script src="student-cloud.js"></script>
+  <script src="cloud.js?v=07b0eb7a44f7"></script>
+  <script src="student-cloud.js?v=c8d725875bf4"></script>
   <script>"use strict";
 const MAP_CONFIG = {"url": "https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiZXhwIjozNjg2OTI1NzYzfQ.y45vSsbxFjV9k-psYujSR2YMtDOeZW_IDZS6eBlbRFc"};
-function startMapPractice(bank, cloud, student, initialPaperId) {
+function startMapPractice(bank, cloud, student, initialPaperId, initialGrade) {
 "use strict";
 
 const papers = new Map(bank.papers.map(paper => [paper.id, paper]));
@@ -650,18 +651,17 @@ function fillSelect(select, options, current, placeholder) {
 }
 
 const selection = { subject: "", grade: "", difficulty: "", paper: "", size: "10", range: "0", ...load("selection") };
-const filters = ["subject", "grade", "difficulty", "paper"];
+const filters = ["grade", "subject", "difficulty", "paper"];
 
 function renderSetup() {
-  const subjects = [...new Set(bank.papers.map(paper => paper.subject))];
+  selection.grade = fillSelect(get("grade"), mapGradeOptions(bank.papers), selection.grade, "选择年级");
+  const inGrade = bank.papers.filter(paper => String(paper.grade) === selection.grade);
+  const subjects = [...new Set(inGrade.map(paper => paper.subject))];
   selection.subject = fillSelect(get("subject"), subjects.map(subject => [subject, subject]), selection.subject, "选择科目");
-  const inSubject = bank.papers.filter(paper => paper.subject === selection.subject);
-  const grades = [...new Set(inSubject.map(paper => paper.grade))].sort((a, b) => a - b);
-  selection.grade = fillSelect(get("grade"), grades.map(grade => [String(grade), `Grade ${grade}`]), selection.grade, "选择年级");
-  const inGrade = inSubject.filter(paper => String(paper.grade) === selection.grade);
-  const levels = ["Basic", "Proficient", "Advanced"].filter(level => inGrade.some(paper => paper.difficulty === level));
+  const inSubject = inGrade.filter(paper => paper.subject === selection.subject);
+  const levels = ["Basic", "Proficient", "Advanced"].filter(level => inSubject.some(paper => paper.difficulty === level));
   selection.difficulty = fillSelect(get("difficulty"), levels.map(level => [level, level]), selection.difficulty, "选择难度");
-  const inLevel = inGrade.filter(paper => paper.difficulty === selection.difficulty);
+  const inLevel = inSubject.filter(paper => paper.difficulty === selection.difficulty);
   selection.paper = fillSelect(get("paper"), inLevel.map(paper => [
     paper.id, `${paperTitle(paper)}（${paper.questions.length} 题）`,
   ]), selection.paper, "选择原卷");
@@ -672,7 +672,9 @@ function renderSetup() {
   button.disabled = !paper;
   if (!paper) {
     availableSets = [];
-    get("selection-caption").textContent = "请选择科目、年级、难度和原卷。";
+    get("selection-caption").textContent = selection.grade && !inGrade.length
+      ? `Grade ${selection.grade} 暂无题库，请选择已开放的年级。`
+      : "请选择年级、科目、难度和原卷。";
     button.textContent = "开始练习 →";
     return;
   }
@@ -1074,13 +1076,18 @@ get("retry-quiz").addEventListener("click", () => {
 });
 
 const linkedPaper = papers.get(initialPaperId);
-if (linkedPaper) Object.assign(selection, {
-  subject: linkedPaper.subject,
-  grade: String(linkedPaper.grade),
-  difficulty: linkedPaper.difficulty,
-  paper: linkedPaper.id,
-  range: "0",
-});
+if (linkedPaper) {
+  Object.assign(selection, {
+    subject: linkedPaper.subject,
+    grade: String(linkedPaper.grade),
+    difficulty: linkedPaper.difficulty,
+    paper: linkedPaper.id,
+    range: "0",
+  });
+} else if (initialGrade && initialGrade !== selection.grade) {
+  Object.assign(selection, { grade: initialGrade, subject: "", difficulty: "", paper: "", range: "0" });
+  save("selection", selection);
+}
 get("bank-total").textContent = `${bank.papers.length} 份原卷 · ${bank.papers.reduce((sum, paper) => sum + paper.questions.length, 0)} 道题`;
 showSetup();
 }

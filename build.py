@@ -34,10 +34,11 @@ def replace_function(source, name, replacement):
 
 STUDENT_GATE = """
     <section id="join-view" class="map-card map-gate" aria-labelledby="join-title">
-      <p class="kicker">MAP GRADE 6</p>
+      <p class="kicker">MAP · GRADE 1–12</p>
       <h1 id="join-title">进入在线练习</h1>
-      <p class="map-muted">使用老师发来的链接或班级码，填写姓名拼音缩写即可开始。</p>
+      <p class="map-muted">选择年级后，使用老师发来的链接或班级码进入题库。</p>
       <form id="join-form" class="map-form">
+        <label>年级 <select id="join-grade"><option value="">进入题库后再选</option></select></label>
         <label>姓名拼音缩写 <input id="student-name" maxlength="16" placeholder="例如 HQ" autocapitalize="characters" required></label>
         <label>班级码 <input id="class-code" maxlength="36" autocomplete="off" spellcheck="false" required></label>
         <button class="map-button map-primary" id="join-button" type="submit">进入题库</button>
@@ -72,7 +73,7 @@ TEACHER_WORKSPACE = """
         <details id="import-bank">
           <summary id="import-summary">题库导入</summary>
           <form id="import-form" class="map-form">
-            <label>选择 MAP_本地练习_老师版.html <input id="bank-file" type="file" accept=".html,text/html" required></label>
+            <label>选择要导入的 MAP 本地老师版 HTML <input id="bank-file" type="file" accept=".html,text/html" required></label>
             <button class="map-button map-primary" id="import-button" type="submit">导入 Supabase</button>
           </form>
           <p id="import-status" class="map-status" role="status"></p>
@@ -100,6 +101,9 @@ TEACHER_WORKSPACE = """
         <button class="map-button" id="clear-attempt">返回纯讲义</button>
       </section>
       <div id="teacher-worksheet" hidden>
+        <section class="map-card map-toolbar">
+          <label>讲义年级 <select id="worksheet-grade"></select></label>
+        </section>
         <p id="worksheet-status" class="map-status" role="status"></p>
 """
 
@@ -127,7 +131,11 @@ GRADE_DIALOG = """
 
 def student_template():
     template = read(SOURCE / "practice.template.html")
-    template = swap(template, "<span>MAP 本地练习</span>", "<span>MAP Grade 6 在线练习</span>")
+    template = swap(template, "<span>MAP 本地练习</span>", "<span>MAP 在线练习</span>")
+    template = swap(template, "按科目、年级和难度，找到要练习的原卷。", "先选年级，再按科目和难度选择原卷。")
+    template = swap(template, '''          <label><span><b>01</b> 科目</span><select id="subject"></select></label>
+          <label><span><b>02</b> 年级</span><select id="grade"></select></label>''', '''          <label><span><b>01</b> 年级</span><select id="grade"></select></label>
+          <label><span><b>02</b> 科目</span><select id="subject"></select></label>''')
     template = swap(template, '<nav class="site-nav" aria-label="主要导航">', '<nav id="student-controls" class="site-nav" aria-label="主要导航" hidden>')
     template = swap(template, '<button id="nav-history" type="button">练习记录</button>', '<button id="nav-history" type="button">练习记录</button><button id="change-student" type="button">更换学生</button>')
     template = swap(template, "  <main>\n", "  <main>\n" + STUDENT_GATE)
@@ -141,6 +149,22 @@ def student_script():
     source = swap(source, 'const bank = JSON.parse(document.getElementById("practice-bank").textContent);\nconst teacherEdition = bank.edition === "teacher";\n', "")
     source = swap(source, "const prefix = `map-local-practice-v1:${bank.edition}:`;", "const prefix = `map-g6-v1:${cloud.classCode}:${student}:`;")
     source = swap(source, "const encoder = new TextEncoder();\n", "")
+    source = swap(source, 'const filters = ["subject", "grade", "difficulty", "paper"];', 'const filters = ["grade", "subject", "difficulty", "paper"];')
+    source = swap(source, '''  const subjects = [...new Set(bank.papers.map(paper => paper.subject))];
+  selection.subject = fillSelect(get("subject"), subjects.map(subject => [subject, subject]), selection.subject, "选择科目");
+  const inSubject = bank.papers.filter(paper => paper.subject === selection.subject);
+  const grades = [...new Set(inSubject.map(paper => paper.grade))].sort((a, b) => a - b);
+  selection.grade = fillSelect(get("grade"), grades.map(grade => [String(grade), `Grade ${grade}`]), selection.grade, "选择年级");
+  const inGrade = inSubject.filter(paper => String(paper.grade) === selection.grade);''', '''  selection.grade = fillSelect(get("grade"), mapGradeOptions(bank.papers), selection.grade, "选择年级");
+  const inGrade = bank.papers.filter(paper => String(paper.grade) === selection.grade);
+  const subjects = [...new Set(inGrade.map(paper => paper.subject))];
+  selection.subject = fillSelect(get("subject"), subjects.map(subject => [subject, subject]), selection.subject, "选择科目");
+  const inSubject = inGrade.filter(paper => paper.subject === selection.subject);''')
+    source = swap(source, '  const levels = ["Basic", "Proficient", "Advanced"].filter(level => inGrade.some', '  const levels = ["Basic", "Proficient", "Advanced"].filter(level => inSubject.some')
+    source = swap(source, "  const inLevel = inGrade.filter(", "  const inLevel = inSubject.filter(")
+    source = swap(source, '    get("selection-caption").textContent = "请选择科目、年级、难度和原卷。";', '''    get("selection-caption").textContent = selection.grade && !inGrade.length
+      ? `Grade ${selection.grade} 暂无题库，请选择已开放的年级。`
+      : "请选择年级、科目、难度和原卷。";''')
     source = swap(source, "let active = null;", "let active = null;\nlet opening = 0;\nlet finishing = false;")
     source = swap(source, 'function showView(name) {\n', 'function showView(name) {\n  if (name !== "quiz") { opening += 1; cloud.show(null); }\n')
     source = swap(source, 'id: now.toString(36) + "-" + Math.random().toString(36).slice(2),', "id: crypto.randomUUID(),\n    token: crypto.randomUUID(),\n    revision: 0,")
@@ -215,19 +239,25 @@ async function finishAttempt() {
     source = swap(source, '  const record = saved || newAttempt(paper, set);\n  saveAttempt(record);', '  const record = saved || newAttempt(paper, set);\n  if (!saved) saveAttempt(record);')
     source = swap(source, 'document.body.dataset.edition = bank.edition;\nget("edition").textContent = teacherEdition ? "老师版" : "学生版";', '''
 const linkedPaper = papers.get(initialPaperId);
-if (linkedPaper) Object.assign(selection, {
-  subject: linkedPaper.subject,
-  grade: String(linkedPaper.grade),
-  difficulty: linkedPaper.difficulty,
-  paper: linkedPaper.id,
-  range: "0",
-});'''.strip())
-    return "function startMapPractice(bank, cloud, student, initialPaperId) {\n" + source + "}\nmountMapStudent();"
+if (linkedPaper) {
+  Object.assign(selection, {
+    subject: linkedPaper.subject,
+    grade: String(linkedPaper.grade),
+    difficulty: linkedPaper.difficulty,
+    paper: linkedPaper.id,
+    range: "0",
+  });
+} else if (initialGrade && initialGrade !== selection.grade) {
+  Object.assign(selection, { grade: initialGrade, subject: "", difficulty: "", paper: "", range: "0" });
+  save("selection", selection);
+}'''.strip())
+    return "function startMapPractice(bank, cloud, student, initialPaperId, initialGrade) {\n" + source + "}\nmountMapStudent();"
 
 
 def teacher_template():
     template = read(SOURCE / "teacher.template.html")
-    template = swap(template, "MAP 教师讲义", "MAP Grade 6 作答与讲义")
+    template = swap(template, "MAP 教师讲义", "MAP 作答与讲义")
+    template = swap(template, '<section class="picker" aria-label="选择原卷">', '<section class="picker" id="worksheet-filters" aria-label="选择原卷">')
     template = swap(template, "  <main>\n", "  <main>\n" + TEACHER_WORKSPACE)
     return swap(template, "  </main>", '      </div>\n    </div>\n    <footer class="map-footer"><a href="./">学生入口</a></footer>\n  </main>\n' + GRADE_DIALOG)
 
@@ -235,16 +265,41 @@ def teacher_template():
 def teacher_script():
     source = read(SOURCE / "teacher.js")
     source = swap(source, 'const bank = JSON.parse(document.getElementById("practice-bank").textContent);\n', "")
-    source = swap(source, "const defaultPaper =", "let defaultPaper =")
     source = swap(source, "    activePaper = paper;\n    location.hash = paper.id;", "    onPaperChange();\n    activePaper = paper;\n    location.hash = paper.id;")
     source = swap(source, '  row.append(stem, optionCell, explanation);', '  explanation.append(node("div", "map-overlay"));\n  row.append(stem, optionCell, explanation);')
     source = swap(source, '  get("worksheet-rows").replaceChildren(sheet);', '  get("worksheet-rows").replaceChildren(sheet);\n  renderedPaper = paper;\n  refreshOverlay();')
     source = swap(source, '  get("instructions").hidden = !activePaper.instructions;\n  rich(get("instructions"), activePaper.instructions);\n  renderWorksheet(activePaper);', '  showWorksheet(activePaper.id);')
-    source = swap(source, "  if (paper.id !== activePaper.id) {\n    activePaper = paper;\n    render();", "  if (paper.id !== activePaper.id) {\n    onPaperChange();\n    activePaper = paper;\n    render();")
-    source = source[:source.index('get("bank-total").textContent =')]
+    source = swap(source, "  const subject = activePaper.subject;", '''  get("worksheet-grade").value = selectedGrade;
+  get("worksheet-filters").hidden = !activePaper;
+  get("paper-panel").hidden = !activePaper;
+  get("share-paper").disabled = !activePaper;
+  if (!activePaper) {
+    loading += 1;
+    renderedPaper = null;
+    get("worksheet-rows").replaceChildren();
+    get("worksheet-status").textContent = "Grade " + selectedGrade + " 尚未导入题库。";
+    return;
+  }
+  const gradePapers = bank.papers.filter(paper => String(paper.grade) === selectedGrade);
+  const subject = activePaper.subject;''')
+    source = swap(source, '  const subjects = [...new Set(bank.papers.map(paper => paper.subject))];', '  const subjects = [...new Set(gradePapers.map(paper => paper.subject))];')
+    source = swap(source, 'bank.papers.find(paper => paper.subject === value && paper.difficulty === level)', 'gradePapers.find(paper => paper.subject === value && paper.difficulty === level)')
+    source = swap(source, '|| bank.papers.find(paper => paper.subject === value)', '|| gradePapers.find(paper => paper.subject === value)')
+    source = swap(source, '  const inSubject = bank.papers.filter(paper => paper.subject === subject);', '  const inSubject = gradePapers.filter(paper => paper.subject === subject);')
+    source = source[:source.index('window.addEventListener("hashchange"')]
     source += """
 let renderedPaper = null;
 let loading = 0;
+let selectedGrade = String(activePaper.grade);
+
+function selectGrade(grade) {
+  selectedGrade = grade;
+  activePaper = bank.papers.find(paper => String(paper.grade) === grade) || null;
+  onPaperChange();
+  if (activePaper) location.hash = activePaper.id;
+  else history.replaceState(null, "", location.pathname + location.search);
+  render();
+}
 
 function refreshOverlay() {
   for (const question of renderedPaper?.questions || []) {
@@ -278,22 +333,33 @@ function setCatalog(catalog) {
   bank.papers = catalog;
   papers.clear();
   for (const paper of catalog) papers.set(paper.id, paper);
-  defaultPaper = papers.get(defaultPaper.id) || catalog[0];
-  activePaper = papers.get(activePaper.id) || defaultPaper;
+  activePaper = papers.get(activePaper?.id)
+    || catalog.find(paper => String(paper.grade) === selectedGrade) || null;
+  get("worksheet-grade").replaceChildren(...mapGradeOptions(catalog).map(([value, label]) => new Option(label, value)));
   get("bank-total").textContent = catalog.length + " 份原卷 · "
     + catalog.reduce((sum, paper) => sum + paper.questions.length, 0) + " 道题";
   render();
 }
 
+get("worksheet-grade").onchange = event => selectGrade(event.target.value);
+window.addEventListener("hashchange", () => {
+  const paper = papers.get(location.hash.slice(1));
+  if (!paper || paper.id === activePaper?.id) return;
+  onPaperChange();
+  activePaper = paper;
+  selectedGrade = String(paper.grade);
+  render();
+});
 setCatalog(bank.papers);
 return {
   refreshOverlay,
   setCatalog,
-  activeId: () => activePaper.id,
+  activeId: () => activePaper?.id,
   open(id) {
     const paper = papers.get(id);
-    if (!paper || id === activePaper.id) return;
+    if (!paper || id === activePaper?.id) return;
     activePaper = paper;
+    selectedGrade = String(paper.grade);
     location.hash = paper.id;
     render();
   },
@@ -315,6 +381,11 @@ def public_config(det_page):
     return {"url": url, "key": key}
 
 
+def asset_url(name):
+    version = hashlib.sha256((SITE / name).read_bytes()).hexdigest()[:12]
+    return f"{name}?v={version}"
+
+
 def build(filename, name, title, template, script, config):
     script = '"use strict";\nconst MAP_CONFIG = ' + json.dumps(config) + ";\n" + script
     digest = base64.b64encode(hashlib.sha256(script.encode("utf-8")).digest()).decode("ascii")
@@ -325,7 +396,7 @@ def build(filename, name, title, template, script, config):
         "style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'"
     )
     head = f'  <meta http-equiv="Content-Security-Policy" content="{html.escape(csp, quote=True)}">\n'
-    head += '  <meta name="referrer" content="no-referrer">\n  <link rel="stylesheet" href="cloud.css">\n'
+    head += f'  <meta name="referrer" content="no-referrer">\n  <link rel="stylesheet" href="{asset_url("cloud.css")}">\n'
     template = swap(template, "  <title>", head + "  <title>")
     template = swap(template, "@@STYLE@@", read(SOURCE / f"{name}.css"))
     template = swap(template, "@@TITLE@@", title)
@@ -335,8 +406,8 @@ def build(filename, name, title, template, script, config):
             '  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.89.0/dist/umd/supabase.js" '
             'integrity="sha384-sddcMIX7Ar6auuLM3TihDPYO6uOeMYsjtmZKfi8V83eeqdFWdnpAtk90odEwbXjh" crossorigin="anonymous"></script>\n'
         )
-    loader += '  <script src="cloud.js"></script>\n'
-    loader += f'  <script src="{"teacher" if teacher else "student"}-cloud.js"></script>'
+    loader += f'  <script src="{asset_url("cloud.js")}"></script>\n'
+    loader += f'  <script src="{asset_url(name.replace("practice", "student") + "-cloud.js")}"></script>'
     template = swap(template, '  <script id="practice-bank" type="application/json">@@BANK@@</script>', loader)
     template = swap(template, "@@SCRIPT@@", script)
     (SITE / filename).write_text(template, encoding="utf-8", newline="\n")
@@ -346,5 +417,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--det-page", type=Path, required=True, help="Path to the existing DET wp.html")
     config = public_config(parser.parse_args().det_page)
-    build("index.html", "practice", "MAP Grade 6 在线练习", student_template(), student_script(), config)
-    build("作答记录-老师登录版本.html", "teacher", "MAP Grade 6 作答记录 · 老师登录版本", teacher_template(), teacher_script(), config)
+    build("index.html", "practice", "MAP 在线练习", student_template(), student_script(), config)
+    build("作答记录-老师登录版本.html", "teacher", "MAP 作答记录 · 老师登录版本", teacher_template(), teacher_script(), config)

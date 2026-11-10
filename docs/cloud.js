@@ -1,5 +1,14 @@
 "use strict";
 
+function mapGradeOptions(papers) {
+  const available = papers ? new Set(papers.map(paper => String(paper.grade))) : null;
+  return Array.from({ length: 12 }, (_, index) => {
+    const value = String(index + 1);
+    const suffix = available && !available.has(value) ? "（暂无题库）" : "";
+    return [value, "Grade " + value + suffix];
+  });
+}
+
 function mapMessage(error) {
   const text = String(error?.message || error || "");
   if (error?.code === "PGRST202" || error?.code === "PGRST205" || error?.code === "42P01") {

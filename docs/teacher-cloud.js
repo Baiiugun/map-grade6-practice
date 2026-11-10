@@ -8,11 +8,13 @@ function mapReadBank(text) {
   const startTag = '<script id="practice-bank" type="application/json">';
   const start = text.indexOf(startTag);
   const end = text.indexOf("</script>", start + startTag.length);
-  if (start < 0 || end < 0) throw new Error("请选择 MAP_本地练习_老师版.html。");
+  if (start < 0 || end < 0) throw new Error("请选择要导入的 MAP 本地老师版 HTML。");
   const bank = JSON.parse(text.slice(start + startTag.length, end));
   if (bank.edition !== "teacher" || !bank.papers?.length || !bank.images) throw new Error("请选择 MAP 本地老师版。");
   const ids = new Set();
-  return bank.papers.map((paper, index) => {
+  return bank.papers.map(paper => {
+    const grade = Number(paper.grade);
+    if (!Number.isInteger(grade) || grade < 1 || grade > 12) throw new Error("原卷需标明 Grade 1–12 中的一个年级。");
     if (!paper.id || ids.has(paper.id) || !paper.questions?.length || paper.questions.length > 100) {
       throw new Error("原卷编号或题数不合要求。");
     }
@@ -32,7 +34,7 @@ function mapReadBank(text) {
       if (!/^data:image\/(?:png|webp);base64,/.test(bank.images[id])) throw new Error("原卷缺少题图 " + id);
       return [id, bank.images[id]];
     }));
-    return { id: paper.id, seq: index + 1, paper, images };
+    return { id: paper.id, paper: { ...paper, grade }, images };
   });
 }
 
@@ -64,7 +66,7 @@ async function mountMapTeacher() {
 
   function title(paper) {
     if (!paper) return "原卷";
-    return paper.difficulty + " · " + paper.domain + " · " + paper.kind + " " + paper.number;
+    return "Grade " + paper.grade + " · " + paper.difficulty + " · " + paper.domain + " · " + paper.kind + " " + paper.number;
   }
 
   async function loadPaper(id) {
@@ -198,7 +200,7 @@ async function mountMapTeacher() {
     if (error) throw error;
     papers = new Map(data.map(paper => [paper.id, paper]));
     get("import-summary").textContent = data.length
-      ? data.length + " 份原卷已导入"
+      ? "导入题库 · 已有 " + data.length + " 份原卷"
       : "首次使用 · 请导入本地老师版";
     get("teacher-worksheet").hidden = !data.length;
     get("share-entry").disabled = !data.length;
@@ -279,10 +281,18 @@ async function mountMapTeacher() {
     button.disabled = true;
     message.textContent = "正在核对本地题库…";
     try {
-      const rows = mapReadBank(await file.text());
+      const rows = mapReadBank(await file.text()).filter(row => {
+        const existing = papers.get(row.id);
+        if (existing && Number(existing.grade) !== row.paper.grade) throw new Error("不同年级的原卷编号需要区分。");
+        return !existing;
+      });
+      const { data: latest, error: seqError } = await client.from("map_g6_papers").select("seq")
+        .order("seq", { ascending: false }).limit(1);
+      if (seqError) throw seqError;
+      const firstSeq = (latest[0]?.seq ?? 0) + 1;
       for (const [index, row] of rows.entries()) {
         message.textContent = "导入原卷 " + (index + 1) + " / " + rows.length + "…";
-        const { error } = await client.from("map_g6_papers").upsert(row, { onConflict: "id", ignoreDuplicates: true });
+        const { error } = await client.from("map_g6_papers").upsert({ ...row, seq: firstSeq + index }, { onConflict: "id", ignoreDuplicates: true });
         if (error) throw error;
       }
       await loadCatalog();

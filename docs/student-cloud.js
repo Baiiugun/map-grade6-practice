@@ -124,9 +124,11 @@ async function mountMapStudent() {
   const link = new URLSearchParams(location.hash.slice(1));
   const code = get("class-code");
   const name = get("student-name");
+  const grade = get("join-grade");
   const form = get("join-form");
   const hint = get("join-status");
   const start = get("join-button");
+  grade.append(...mapGradeOptions().map(([value, label]) => new Option(label, value)));
   code.value = link.get("class") || saved.code || "";
   name.value = saved.code === code.value ? saved.name || "" : "";
 
@@ -156,7 +158,7 @@ async function mountMapStudent() {
         mapWriteLocal(savedKey, { code: classCode, name: "" });
         location.reload();
       };
-      startMapPractice({ papers, images: {} }, cloud, student, link.get("paper"));
+      startMapPractice({ papers, images: {} }, cloud, student, link.get("paper"), grade.value);
     } catch (error) {
       get("join-view").hidden = false;
       get("practice-app").hidden = true;

@@ -1,4 +1,4 @@
-# MAP Grade 6 在线练习
+# MAP 在线练习（Grade 1–12）
 
 - [学生入口](https://baiiugun.github.io/map-grade6-practice/)
 - [作答记录与课堂讲义 · 老师登录版](https://baiiugun.github.io/map-grade6-practice/作答记录-老师登录版本.html)
@@ -11,6 +11,8 @@
 
 导入中断时可以用同一文件重试。重新运行初始化脚本会保留既有班级码、原卷和作答。
 
+学生可以先选年级，再按科目、难度和原卷选题。老师用「讲义年级」切换。当前提供 Grade 6 题库，其他年级导入后会自动开放。在老师页展开「导入题库」，选择带对应年级信息的本地老师版 HTML 即可继续添加原卷。
+
 ## 上课时怎么用
 
 - 学生答题时网页会保存进度。老师页在「实时作答」中显示已答题数，点「在讲义中看」可以查看原答。
@@ -19,6 +21,6 @@
 
 ## 维护
 
-GitHub Pages 从 `main` 的 `/docs` 发布页面。MAP 数据在现有 Supabase 的 `map_g6_*` 表中，题库由老师页读取本地讲义后逐卷导入。
+GitHub Pages 从 `main` 的 `/docs` 发布页面。原网址和 Supabase 的 `map_g6_*` 表名沿用首次部署时的名称，以便已有链接和作答继续可用。题库由老师页读取本地讲义后逐卷导入。
 
 本地调整 MAP 页面模板后，在本项目目录运行 `python build.py --det-page "<DET 项目中的 wp.html 路径>"`，生成学生入口和老师入口。在线逻辑位于 `docs/cloud.js`、`docs/student-cloud.js` 和 `docs/teacher-cloud.js`。
