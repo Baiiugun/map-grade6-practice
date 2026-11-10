@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-NOkNyJxN2cBdjwr8RwdYpbm9T0WF8FBrbkTRQZkywtU=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+  <meta name="referrer" content="no-referrer">
+  <link rel="stylesheet" href="cloud.css">
+  <title>MAP Grade 6 作答记录 · 老师登录版本</title>
+  <style>:root {
+  color-scheme: light;
+  font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  --ink: #192d41;
+  --muted: #4b647c;
+  --navy: #153f67;
+  --blue: #1c5b94;
+  --line: #d7e3ed;
+  --page: #f2f6fa;
+  --card: #fff;
+  --grid: minmax(0, 1.04fr) minmax(0, .85fr) minmax(0, 1.16fr);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; color: var(--ink); background: var(--page); font-size: 16px; }
+button { font: inherit; cursor: pointer; }
+h1, h2, p { margin-top: 0; }
+button:focus-visible, summary:focus-visible, [tabindex="0"]:focus-visible {
+  outline: 3px solid #4386bd;
+  outline-offset: 3px;
+}
+
+.masthead {
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+.masthead-inner, main {
+  width: min(1490px, calc(100% - 40px));
+  margin-inline: auto;
+}
+.masthead-inner {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding-block: 11px;
+}
+.brand-icon { width: 36px; height: 36px; flex: none; color: var(--navy); }
+.brand-name { color: var(--navy); font-weight: 750; font-size: 20px; }
+.bank-total { margin-left: auto; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+main { padding: 18px 0 45px; }
+.picker {
+  padding: 12px 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.picker-row { display: grid; grid-template-columns: 53px minmax(0, 1fr); align-items: start; gap: 6px; padding-block: 4px; }
+.picker-label { padding-top: 8px; color: var(--muted); font-weight: 650; font-size: 13px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab {
+  min-height: 35px;
+  border: 1px solid #ccdae7;
+  border-radius: 6px;
+  color: var(--navy);
+  background: #f6f9fc;
+  padding: 5px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+}
+.tab:hover { border-color: #95b8d6; background: #eaf3fb; }
+.tab[aria-selected="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+.paper-picker { border-top: 1px solid #e5edf4; margin-top: 6px; padding-top: 10px; }
+.paper-tabs .tab { font-size: 13px; min-height: 38px; }
+
+.paper-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 11px 20px;
+  margin: 19px 0 11px;
+}
+.paper-meta { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
+h1 { margin: 0; font-size: clamp(22px, 2.5vw, 31px); font-weight: 750; letter-spacing: -.018em; line-height: 1.2; }
+.legend { display: flex; flex-wrap: wrap; gap: 7px 13px; color: var(--muted); font-size: 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.legend i { display: inline-block; width: 13px; height: 13px; padding: 0; border: 1px solid currentColor; }
+.instructions { margin: 0 0 11px; color: var(--muted); font-size: 13px; }
+.worksheet {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+.column-headings, .question-row { display: grid; grid-template-columns: var(--grid); }
+.column-headings {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  color: white;
+  background: var(--navy);
+  border-radius: 8px 8px 0 0;
+  font-weight: 670;
+  font-size: 14px;
+}
+.column-headings > span { padding: 9px 15px; }
+.column-headings > span + span { border-left: 1px solid #ffffff38; }
+.question-row { border-top: 1px solid var(--line); scroll-margin-top: 43px; }
+.question-row:last-child { border-radius: 0 0 8px 8px; }
+.question-row:focus { outline: 2px solid #4386bd; outline-offset: -2px; }
+.cell { min-width: 0; padding: 13px 15px 16px; }
+.cell + .cell { border-left: 1px solid var(--line); }
+.question-heading { display: flex; align-items: baseline; gap: 7px; margin-bottom: 8px; }
+.question-heading h2 { font-size: 15px; color: var(--navy); margin: 0; white-space: nowrap; }
+.question-stem { font-size: 15px; }
+.reference {
+  background: #eaf3fb;
+  color: var(--navy);
+  border: 0;
+  border-radius: 4px;
+  padding: 3px 7px;
+  margin: 7px 5px 0 0;
+  font-size: 12px;
+}
+.reference:hover { text-decoration: underline; }
+.mobile-label { display: none; }
+.options { display: grid; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.option {
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr);
+  align-items: start;
+  gap: 7px;
+  border: 1px solid #dce7ef;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 14px;
+}
+.option.correct { border-color: #a9d3bf; background: #edf8f1; }
+.option-letter {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: #edf3f8;
+  color: var(--navy);
+  font-size: 13px;
+  font-weight: 730;
+}
+.option.correct .option-letter { color: #14533b; background: #d6ebdf; }
+.explanation-cell { background: #f9fbfe; }
+.answer-tag {
+  display: inline-block;
+  margin-bottom: 8px;
+  border: 1px solid #c1dfce;
+  border-radius: 5px;
+  background: #e9f5ed;
+  color: #17543d;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: 730;
+}
+.answer-tag.disputed { color: #755518; border-color: #e9d6a7; background: #fff5dc; }
+.explanation { font-size: 14px; line-height: 1.72; }
+.explanation p { margin: 0; }
+.explanation p + p { margin-top: 6px; }
+.source-note { margin: 9px 0 0; border-left: 3px solid #d5af62; background: #fff8e9; padding: 6px 8px; color: #654b1b; font-size: 12px; line-height: 1.6; }
+.term { border-radius: 3px; padding: 0 .13em; -webkit-box-decoration-break: clone; box-decoration-break: clone; font-weight: 620; }
+.term.focus { background: #fff0be; color: #503811; }
+.term.original { background: #fbe0e3; color: #8d2940; }
+.term.revision { background: #d9f0df; color: #174b32; }
+
+.rich { line-height: 1.66; overflow-wrap: anywhere; }
+.rich p { margin: .55em 0; }
+.rich > :first-child { margin-top: 0; }
+.rich > :last-child { margin-bottom: 0; }
+.rich pre { white-space: pre-wrap; font: inherit; }
+.rich u { text-underline-offset: .14em; text-decoration-thickness: 1.3px; }
+.rich .table-scroll { max-width: 100%; overflow-x: auto; margin-block: 9px; }
+.rich table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.rich th, .rich td { border: 1px solid #b9ccde; min-width: 58px; padding: 5px 8px; vertical-align: top; text-align: left; }
+.rich th { background: #ebf2f9; }
+.rich .asset { margin: 10px 0; }
+.rich img { display: block; max-width: 100%; width: auto; height: auto; margin-inline: auto; }
+.rich figcaption { margin: 5px 0 0; color: var(--muted); font-size: 13px; text-align: center; }
+.rich details { border: 1px solid var(--line); border-radius: 5px; background: #f6f9fc; padding: 6px 9px; margin: 6px 0; }
+.rich summary { cursor: pointer; color: var(--navy); font-weight: 650; }
+.rich .plain-text { white-space: pre-wrap; text-align: left; }
+.reading-material { border-top: 1px solid var(--line); }
+.reading-material > summary { cursor: pointer; background: #e9f1f9; color: var(--navy); padding: 9px 14px; font-size: 14px; font-weight: 680; }
+.material-body { width: min(100%, 1050px); margin-inline: auto; padding: 12px 15px 14px; }
+.material-body > div + div { border-top: 1px solid var(--line); padding-top: 11px; margin-top: 11px; }
+
+@media (max-width: 1050px) {
+  .masthead-inner, main { width: calc(100% - 28px); }
+  .cell { padding-inline: 11px; }
+  .option { grid-template-columns: 21px minmax(0, 1fr); padding-inline: 6px; gap: 5px; }
+  .option-letter { width: 21px; height: 22px; }
+}
+@media (max-width: 730px) {
+  .masthead-inner, main { width: calc(100% - 22px); }
+  .masthead-inner { gap: 7px; }
+  .brand-icon { width: 29px; height: 29px; }
+  .brand-name { font-size: 16px; }
+  .bank-total { font-size: 11px; }
+  .picker { padding: 8px 9px; }
+  .picker-row { grid-template-columns: 37px minmax(0, 1fr); }
+  .tab, .paper-tabs .tab { font-size: 12px; padding-inline: 7px; }
+  .column-headings { display: none; }
+  .question-row { grid-template-columns: minmax(0, 1fr); scroll-margin-top: 8px; }
+  .cell + .cell { border-left: 0; border-top: 1px solid #e6edf4; }
+  .mobile-label { display: block; color: var(--navy); font-size: 13px; font-weight: 680; margin: 0 0 7px; }
+  .question-row + .question-row { border-top: 3px solid var(--line); }
+  .material-body { padding-inline: 11px; }
+}
+</style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <svg class="brand-icon" viewBox="0 0 40 40" aria-hidden="true">
+        <rect width="40" height="40" rx="10" fill="currentColor"/>
+        <path d="M12 11h15a2 2 0 0 1 2 2v16H14a3 3 0 0 1-3-3V12a1 1 0 0 1 1-1Z" fill="none" stroke="white" stroke-width="1.7"/>
+        <path d="M11 25h18M16 16h8M16 20h6" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name">MAP Grade 6 作答与讲义</span>
+      <span class="bank-total" id="bank-total"></span>
+    </div>
+  </header>
+  <main>
+
+    <section id="teacher-login" class="map-card map-gate">
+      <h1>老师登录</h1>
+      <p class="map-muted">使用 DET 作答记录的老师账号。</p>
+      <form id="teacher-login-form" class="map-form">
+        <label>邮箱 <input id="teacher-email" type="email" autocomplete="username" required></label>
+        <label>密码 <input id="teacher-password" type="password" autocomplete="current-password" required></label>
+        <button class="map-button map-primary" id="teacher-sign-in" type="submit">登录</button>
+      </form>
+    </section>
+    <p id="teacher-status" class="map-status" role="status"></p>
+    <div id="teacher-workspace" hidden>
+      <section class="map-card">
+        <div class="map-toolbar">
+          <strong id="teacher-who"></strong>
+          <button class="map-button" id="share-entry" disabled>复制学生链接</button>
+          <button class="map-button" id="share-paper" disabled>复制当前原卷链接</button>
+          <button class="map-button" id="teacher-sign-out">退出</button>
+        </div>
+        <input id="share-link" class="map-share" aria-label="学生链接" readonly hidden>
+        <p id="share-status" class="map-status" role="status"></p>
+        <details id="import-bank">
+          <summary id="import-summary">题库导入</summary>
+          <form id="import-form" class="map-form">
+            <label>选择 MAP_本地练习_老师版.html <input id="bank-file" type="file" accept=".html,text/html" required></label>
+            <button class="map-button map-primary" id="import-button" type="submit">导入 Supabase</button>
+          </form>
+          <p id="import-status" class="map-status" role="status"></p>
+        </details>
+      </section>
+      <section class="map-card" aria-labelledby="attempt-title">
+        <h2 id="attempt-title">实时作答</h2>
+        <div class="map-toolbar">
+          <label>学生缩写 <input id="filter-student" type="search" maxlength="16"></label>
+          <label>状态 <select id="filter-state"><option value="">全部</option><option value="live">作答中</option><option value="submitted">已交卷</option></select></label>
+          <button class="map-button" id="refresh-attempts">刷新</button>
+        </div>
+        <p id="attempt-status" class="map-status" role="status"></p>
+        <p id="attempt-empty" class="map-muted" hidden>这个筛选范围内暂无作答。</p>
+        <div class="map-table-wrap">
+          <table id="attempt-table" class="map-table" hidden>
+            <thead><tr><th scope="col">学生</th><th scope="col">原卷</th><th scope="col">进度／分数</th><th scope="col">更新时间</th><th scope="col">操作</th></tr></thead>
+            <tbody id="attempt-rows"></tbody>
+          </table>
+        </div>
+        <button class="map-button" id="more-attempts" hidden>显示更多作答</button>
+      </section>
+      <section id="selected-attempt" class="map-card map-toolbar" hidden>
+        <strong id="selected-summary"></strong>
+        <button class="map-button" id="clear-attempt">返回纯讲义</button>
+      </section>
+      <div id="teacher-worksheet" hidden>
+        <p id="worksheet-status" class="map-status" role="status"></p>
+    <section class="picker" aria-label="选择原卷">
+      <div class="picker-row">
+        <span class="picker-label" id="subject-label">科目</span>
+        <div class="tabs" id="subject-tabs" role="tablist" aria-labelledby="subject-label"></div>
+      </div>
+      <div class="picker-row">
+        <span class="picker-label" id="level-label">难度</span>
+        <div class="tabs" id="level-tabs" role="tablist" aria-labelledby="level-label"></div>
+      </div>
+      <div class="picker-row paper-picker">
+        <span class="picker-label" id="paper-label">原卷</span>
+        <div class="tabs paper-tabs" id="paper-tabs" role="tablist" aria-labelledby="paper-label"></div>
+      </div>
+    </section>
+
+    <section id="paper-panel" role="tabpanel" tabindex="0">
+      <div class="paper-heading">
+        <div>
+          <p class="paper-meta" id="paper-meta"></p>
+          <h1 id="paper-title"></h1>
+        </div>
+        <div class="legend" aria-label="高亮说明">
+          <span><i class="term focus" aria-hidden="true"></i>考点</span>
+          <span><i class="term original" aria-hidden="true"></i>原句待改</span>
+          <span><i class="term revision" aria-hidden="true"></i>建议写法</span>
+        </div>
+      </div>
+      <div class="rich instructions" id="instructions" hidden></div>
+      <section class="worksheet" aria-label="原卷题目、选项和解析">
+        <div class="column-headings">
+          <span>题目</span><span>选项</span><span>中文解析</span>
+        </div>
+        <div id="worksheet-rows"></div>
+      </section>
+    </section>
+      </div>
+    </div>
+    <footer class="map-footer"><a href="./">学生入口</a></footer>
+  </main>
+
+  <dialog id="grade-dialog" class="map-dialog" aria-labelledby="grade-title">
+    <form id="grade-form" class="map-form">
+      <h2 id="grade-title"></h2>
+      <p class="map-muted">批改仅老师可见。投屏时可在讲义里展示点评。</p>
+      <label>本题判定
+        <select id="grade-mark">
+          <option value="">沿用自动判定</option><option value="correct">算对</option>
+          <option value="incorrect">算错</option><option value="unscored">不计分</option>
+        </select>
+      </label>
+      <label>讲解点评 <textarea id="grade-note" rows="5" maxlength="2000"></textarea></label>
+      <p id="grade-status" class="map-status" role="status"></p>
+      <div class="map-toolbar">
+        <button id="save-grade" class="map-button map-primary" type="submit">保存批改</button>
+        <button id="cancel-grade" class="map-button" type="button">取消</button>
+      </div>
+    </form>
+  </dialog>
+
+  <noscript><p>请在允许 JavaScript 的浏览器中打开此讲义。</p></noscript>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.89.0/dist/umd/supabase.js" integrity="sha384-sddcMIX7Ar6auuLM3TihDPYO6uOeMYsjtmZKfi8V83eeqdFWdnpAtk90odEwbXjh" crossorigin="anonymous"></script>
+  <script src="cloud.js"></script>
+  <script src="teacher-cloud.js"></script>
+  <script>"use strict";
+const MAP_CONFIG = {"url": "https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiZXhwIjozNjg2OTI1NzYzfQ.y45vSsbxFjV9k-psYujSR2YMtDOeZW_IDZS6eBlbRFc"};
+function startMapWorksheet(bank, loadPaper, overlay, onPaperChange) {
+"use strict";
+
+const papers = new Map(bank.papers.map(paper => [paper.id, paper]));
+const get = id => document.getElementById(id);
+const levelOrder = ["Basic", "Proficient", "Advanced"];
+let defaultPaper = papers.get("language:g06-language-usage-basic-grammar-and-usage-quiz-02") || bank.papers[0];
+const termLabels = { focus: "考点", original: "原句待改", revision: "建议写法" };
+let activePaper = papers.get(location.hash.slice(1)) || defaultPaper;
+
+function node(tag, className = "", text = "") {
+  const item = document.createElement(tag);
+  if (className) item.className = className;
+  if (text) item.textContent = text;
+  return item;
+}
+
+function titleFor(paper) {
+  const domain = paper.domain === "Comprehensive" ? "综合" : paper.domain;
+  return domain + " · " + paper.kind + " " + paper.number;
+}
+
+function activate(paper, tabs) {
+  if (paper.id !== activePaper.id) {
+    onPaperChange();
+    activePaper = paper;
+    location.hash = paper.id;
+    render();
+  }
+  tabs.querySelector('[aria-selected="true"]').focus({ preventScroll: true });
+}
+
+function renderTabs(holder, items, selection, select) {
+  const buttons = items.map(({ value, label }, index) => {
+    const selected = value === selection;
+    const tab = node("button", "tab", label);
+    tab.type = "button";
+    tab.id = holder.id + "-" + index;
+    tab.setAttribute("role", "tab");
+    tab.setAttribute("aria-selected", String(selected));
+    tab.setAttribute("aria-controls", "paper-panel");
+    tab.tabIndex = selected ? 0 : -1;
+    tab.addEventListener("click", () => select(value, holder));
+    return tab;
+  });
+  holder.replaceChildren(...buttons);
+  holder.onkeydown = event => {
+    const index = buttons.indexOf(event.target);
+    if (index === -1) return;
+    let next;
+    if (event.key === "ArrowLeft") next = (index + buttons.length - 1) % buttons.length;
+    else if (event.key === "ArrowRight") next = (index + 1) % buttons.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = buttons.length - 1;
+    else return;
+    event.preventDefault();
+    buttons[next].click();
+  };
+}
+
+function normalizeTerm(value) {
+  return value.toLowerCase().replaceAll("’", "'").replace(/\s+/g, " ");
+}
+
+function highlightRule(terms) {
+  if (!terms.length) return null;
+  const roles = new Map(terms.map(([term, role]) => [normalizeTerm(term), role]));
+  const escaped = [...roles.keys()]
+    .sort((first, second) => second.length - first.length)
+    .map(term => term.replace(/[.*+?^$(){}|[\]\\]/g, "\\$&").replace(/'/g, "['’]").replace(/ /g, "\\s+"));
+  const boundary = "[A-Za-z0-9_'’\\-]";
+  const pattern = new RegExp("(^|[^" + boundary.slice(1) + ")(" + escaped.join("|") + ")(?!" + boundary + ")", "gi");
+  return { roles, pattern };
+}
+
+function highlight(container, rule) {
+  if (!rule) return;
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+  const texts = [];
+  while (walker.nextNode()) {
+    const text = walker.currentNode;
+    if (!text.parentElement.closest("mark, summary, figcaption")) texts.push(text);
+  }
+  for (const text of texts) {
+    const matches = [...text.data.matchAll(rule.pattern)];
+    if (!matches.length) continue;
+    const fragment = document.createDocumentFragment();
+    let end = 0;
+    for (const match of matches) {
+      const start = match.index + match[1].length;
+      const role = rule.roles.get(normalizeTerm(match[2]));
+      const mark = node("mark", "term " + role, match[2]);
+      mark.title = termLabels[role];
+      fragment.append(text.data.slice(end, start), mark);
+      end = start + match[2].length;
+    }
+    fragment.append(text.data.slice(end));
+    text.replaceWith(fragment);
+  }
+}
+
+function rich(element, markup, rule = null) {
+  // HTML and embedded image paths are normalized by the shared build script.
+  element.innerHTML = markup;
+  for (const image of element.querySelectorAll("img[data-image]")) image.src = bank.images[image.dataset.image];
+  highlight(element, rule);
+  return element;
+}
+
+function questionRow(question) {
+  const row = node("article", "question-row");
+  row.id = "question-" + question.number;
+  row.tabIndex = -1;
+  const heading = node("h2", "", "第 " + question.number + " 题");
+  heading.id = row.id + "-heading";
+  row.setAttribute("aria-labelledby", heading.id);
+  const rule = highlightRule(question.terms);
+
+  const stem = node("div", "cell stem-cell");
+  const questionHeading = node("div", "question-heading");
+  questionHeading.append(heading);
+  stem.append(questionHeading, rich(node("div", "rich question-stem"), question.stem, rule));
+  for (const number of question.references) {
+    const button = node("button", "reference", "见第 " + number + " 题");
+    button.type = "button";
+    button.addEventListener("click", () => {
+      const target = get("question-" + number);
+      target.focus({ preventScroll: true });
+      target.scrollIntoView({ block: "start" });
+    });
+    stem.append(button);
+  }
+
+  const optionCell = node("div", "cell option-cell");
+  const options = node("ul", "options");
+  for (const [label, markup] of question.options) {
+    const correct = question.key.includes(label);
+    const option = node("li", correct ? "option correct" : "option");
+    const letter = node("span", "option-letter", label);
+    if (correct) letter.setAttribute("aria-label", label + "，参考答案");
+    option.append(letter, rich(node("div", "rich"), markup, rule));
+    options.append(option);
+  }
+  optionCell.append(node("p", "mobile-label", "选项"), options);
+
+  const explanation = node("div", "cell explanation-cell");
+  const answerText = question.key.length
+    ? (question.key.length === 1 ? "答案 " : "接受 ") + question.key.join("、")
+    : "原题有争议";
+  const answer = node("span", "answer-tag" + (question.key.length ? "" : " disputed"), answerText);
+  const text = node("div", "explanation");
+  for (const paragraph of question.explanation.split(/\n+/)) {
+    if (paragraph.trim()) text.append(node("p", "", paragraph));
+  }
+  highlight(text, rule);
+  explanation.append(node("p", "mobile-label", "中文解析"), answer, text);
+  for (const note of question.notes) explanation.append(node("p", "source-note", note));
+  explanation.append(node("div", "map-overlay"));
+  row.append(stem, optionCell, explanation);
+  return row;
+}
+
+function materialSection(paper, questions) {
+  const section = node("details", "reading-material");
+  section.open = paper.kind === "Quiz";
+  const first = questions[0].number;
+  const last = questions.at(-1).number;
+  const range = first === last ? "第 " + first + " 题" : "第 " + first + "–" + last + " 题";
+  section.append(node("summary", "", "阅读材料 · " + range));
+  const body = node("div", "material-body");
+  for (const id of questions[0].materials) body.append(rich(node("div", "rich"), paper.materials[id]));
+  section.append(body);
+  return section;
+}
+
+function renderWorksheet(paper) {
+  const sheet = document.createDocumentFragment();
+  const questions = paper.questions;
+  for (let first = 0; first < questions.length;) {
+    const materialIds = questions[first].materials.join("|");
+    let last = first + 1;
+    while (last < questions.length && questions[last].materials.join("|") === materialIds) last += 1;
+    const group = questions.slice(first, last);
+    if (materialIds) sheet.append(materialSection(paper, group));
+    for (const question of group) sheet.append(questionRow(question));
+    first = last;
+  }
+  get("worksheet-rows").replaceChildren(sheet);
+  renderedPaper = paper;
+  refreshOverlay();
+}
+
+function render() {
+  const subject = activePaper.subject;
+  const level = activePaper.difficulty;
+  const subjects = [...new Set(bank.papers.map(paper => paper.subject))];
+  renderTabs(
+    get("subject-tabs"), subjects.map(value => ({ value, label: value })), subject,
+    (value, tabs) => activate(
+      bank.papers.find(paper => paper.subject === value && paper.difficulty === level)
+        || bank.papers.find(paper => paper.subject === value),
+      tabs,
+    ),
+  );
+  const inSubject = bank.papers.filter(paper => paper.subject === subject);
+  const levels = levelOrder.filter(value => inSubject.some(paper => paper.difficulty === value));
+  renderTabs(get("level-tabs"), levels.map(value => ({ value, label: value })), level, (value, tabs) => {
+    activate(inSubject.find(paper => paper.difficulty === value), tabs);
+  });
+  const variants = inSubject.filter(paper => paper.difficulty === level);
+  renderTabs(
+    get("paper-tabs"), variants.map(paper => ({ value: paper.id, label: titleFor(paper) })), activePaper.id,
+    (id, tabs) => activate(papers.get(id), tabs),
+  );
+  get("paper-panel").setAttribute("aria-labelledby", get("paper-tabs").querySelector('[aria-selected="true"]').id);
+  get("paper-title").textContent = titleFor(activePaper);
+  get("paper-meta").textContent = [
+    activePaper.subject, "Grade " + activePaper.grade, level, activePaper.questions.length + " 题",
+  ].join(" · ");
+  showWorksheet(activePaper.id);
+}
+
+window.addEventListener("hashchange", () => {
+  const paper = papers.get(location.hash.slice(1)) || defaultPaper;
+  if (paper.id !== activePaper.id) {
+    onPaperChange();
+    activePaper = paper;
+    render();
+  }
+});
+
+let renderedPaper = null;
+let loading = 0;
+
+function refreshOverlay() {
+  for (const question of renderedPaper?.questions || []) {
+    const holder = get("question-" + question.number).querySelector(".map-overlay");
+    const content = overlay(question);
+    holder.replaceChildren(...(content ? [content] : []));
+  }
+}
+
+async function showWorksheet(id) {
+  const request = ++loading;
+  const message = get("worksheet-status");
+  message.textContent = "正在加载讲义…";
+  get("instructions").hidden = true;
+  get("worksheet-rows").replaceChildren();
+  renderedPaper = null;
+  try {
+    const { paper, images } = await loadPaper(id);
+    if (request !== loading) return;
+    Object.assign(bank.images, images);
+    get("instructions").hidden = !paper.instructions;
+    rich(get("instructions"), paper.instructions);
+    renderWorksheet(paper);
+    message.textContent = "";
+  } catch (error) {
+    if (request === loading) message.textContent = mapMessage(error);
+  }
+}
+
+function setCatalog(catalog) {
+  bank.papers = catalog;
+  papers.clear();
+  for (const paper of catalog) papers.set(paper.id, paper);
+  defaultPaper = papers.get(defaultPaper.id) || catalog[0];
+  activePaper = papers.get(activePaper.id) || defaultPaper;
+  get("bank-total").textContent = catalog.length + " 份原卷 · "
+    + catalog.reduce((sum, paper) => sum + paper.questions.length, 0) + " 道题";
+  render();
+}
+
+setCatalog(bank.papers);
+return {
+  refreshOverlay,
+  setCatalog,
+  activeId: () => activePaper.id,
+  open(id) {
+    const paper = papers.get(id);
+    if (!paper || id === activePaper.id) return;
+    activePaper = paper;
+    location.hash = paper.id;
+    render();
+  },
+};
+}
+mountMapTeacher();</script>
+</body>
+</html>

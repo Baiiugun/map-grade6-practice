@@ -1,0 +1,1089 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-QgyYa5DHWHKh0YLA0hnk6H5tjFTZDHe+k/9lHKMLUoc=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+  <meta name="referrer" content="no-referrer">
+  <link rel="stylesheet" href="cloud.css">
+  <title>MAP Grade 6 在线练习</title>
+  <style>:root {
+  color-scheme: light;
+  --ink: #172e45;
+  --muted: #52677c;
+  --blue: #12487a;
+  --primary: #175ca3;
+  --paper: #fff;
+  --background: #f1f5f9;
+  --line: #d5e0ea;
+  --soft: #eaf3fd;
+  --correct: #1a684a;
+  --correct-bg: #dff3e8;
+  --wrong: #9c3840;
+  --wrong-bg: #fbe8e9;
+  font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; color: var(--ink); background: var(--background); font-size: 16px; }
+button, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; }
+button:focus-visible, select:focus-visible, summary:focus-visible, [tabindex="0"]:focus-visible {
+  outline: 3px solid #4286c8;
+  outline-offset: 3px;
+}
+h1, h2, p { margin-top: 0; }
+
+.site-header {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 1120px;
+  margin: auto;
+  padding: 11px 24px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--blue);
+  padding: 0;
+  font-size: 19px;
+  font-weight: 720;
+  white-space: nowrap;
+}
+.brand-icon { width: 36px; height: 36px; flex: 0 0 36px; }
+.edition {
+  border: 1px solid #cfe0f2;
+  border-radius: 999px;
+  padding: 4px 9px;
+  color: var(--blue);
+  background: var(--soft);
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 650;
+}
+[data-edition="teacher"] .edition {
+  border-color: #efd9ac;
+  color: #795519;
+  background: #fff5df;
+}
+.site-nav { display: flex; align-items: center; gap: 5px; margin-left: auto; }
+.site-nav button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--muted);
+  background: transparent;
+  padding: 6px 13px;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 650;
+}
+.site-nav button:hover, .site-nav button[aria-current="page"] { background: var(--soft); color: var(--blue); }
+
+main { max-width: 1120px; margin: auto; padding: 29px 24px 52px; }
+.page-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin: 10px 0 24px;
+}
+.kicker { color: var(--primary); font-size: 12px; font-weight: 750; letter-spacing: .15em; margin-bottom: 8px; }
+h1 { font-size: clamp(25px, 3vw, 35px); letter-spacing: -.025em; line-height: 1.22; margin-bottom: 8px; }
+.subtitle { color: var(--muted); margin: 0; line-height: 1.55; }
+.bank-total {
+  border: 1px solid #cbdeef;
+  border-radius: 8px;
+  padding: 7px 12px;
+  margin: 0;
+  background: #e9f2fb;
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 620;
+}
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--paper);
+  box-shadow: 0 2px 8px #173d6410;
+}
+.setup-panel { padding: 24px; }
+.setup-panel h2 { font-size: 18px; margin-bottom: 18px; }
+.filters { display: grid; grid-template-columns: 1.08fr .75fr .9fr 1.65fr; gap: 14px; }
+.filters label, .range-controls label { display: grid; gap: 8px; min-width: 0; font-size: 14px; font-weight: 650; }
+.filters b { margin-right: 3px; color: #5a7590; font-size: 11px; letter-spacing: .055em; }
+select {
+  min-width: 0;
+  width: 100%;
+  min-height: 45px;
+  border: 1px solid #becfde;
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+  padding: 9px 10px;
+  font-weight: 450;
+}
+select:disabled { color: #667c91; border-color: #dce5ed; background: #f5f8fa; opacity: 1; }
+.range-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 248px));
+  gap: 14px;
+  border-top: 1px solid #e6edf4;
+  margin-top: 20px;
+  padding-top: 18px;
+}
+.setup-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  border-top: 1px solid #e6edf4;
+  margin-top: 22px;
+  padding-top: 19px;
+}
+.selection-caption { margin: 0; color: var(--muted); line-height: 1.55; font-size: 14px; }
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 9px 16px;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 680;
+}
+.primary { background: var(--primary); color: #fff; }
+.primary:hover { background: var(--blue); }
+.primary:disabled { background: #dde6ee; color: #566d83; }
+.secondary { border-color: #c6d6e6; color: var(--blue); background: #fff; }
+.secondary:hover { background: var(--soft); }
+.secondary:disabled { border-color: #dde5ed; background: #f7f9fb; color: #6c8094; }
+.local-note { color: var(--muted); font-size: 13px; margin: 15px 2px 0; }
+.storage-notice {
+  border: 1px solid #f2d690;
+  border-radius: 8px;
+  background: #fff7df;
+  color: #785514;
+  padding: 9px 12px;
+  font-size: 14px;
+}
+
+.breadcrumbs { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+.breadcrumbs button, .text-button {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  padding: 6px 8px;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 650;
+}
+.breadcrumbs button { padding-left: 0; }
+.breadcrumbs button:hover, .text-button:hover { text-decoration: underline; }
+.quiz-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 17px; }
+.quiz-heading h1 { font-size: clamp(22px, 2.75vw, 30px); margin-bottom: 5px; }
+.quiz-heading .subtitle { font-size: 14px; }
+.progress-panel { padding: 17px 20px 18px; margin-bottom: 16px; }
+.metrics { display: flex; flex-wrap: wrap; align-items: stretch; gap: 9px 24px; }
+.metric { min-width: 80px; display: grid; gap: 3px; align-content: start; }
+.metric-label { color: var(--muted); font-size: 12px; font-weight: 650; }
+.metric-value { color: var(--blue); font-size: 23px; font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.metric.positive .metric-value { color: var(--correct); }
+.metric.negative .metric-value { color: var(--wrong); }
+.number-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 5px 12px; border-top: 1px solid #e7eef4; margin-top: 13px; padding-top: 7px; }
+.number-toolbar h2 { font-size: 14px; margin: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-left: auto; color: var(--muted); font-size: 12px; }
+.legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; border: 1px solid #c4d4e2; background: #f0f4f8; }
+.swatch.answered { background: #d7eaff; border-color: #a1c8ef; }
+.swatch.correct { background: var(--correct-bg); border-color: #a6cfba; }
+.swatch.incorrect { background: var(--wrong-bg); border-color: #e4b6bc; }
+.swatch.unscored { background: #fff1d3; border-color: #e1c899; }
+.number-grid { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 7px; margin-top: 8px; }
+.question-number {
+  position: relative;
+  min-height: 43px;
+  border: 1px solid #d8e3ee;
+  border-radius: 6px;
+  background: #f2f6fa;
+  color: #324b64;
+  padding: 4px 2px;
+  font-size: 15px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.question-number.answered { background: #dbeeff; border-color: #b3d5f5; color: #174d83; }
+.question-number.correct { background: var(--correct-bg); border-color: #b5d9c4; color: var(--correct); }
+.question-number.incorrect { background: var(--wrong-bg); border-color: #ecc8ce; color: var(--wrong); }
+.question-number.unscored { background: #fff1d3; border-color: #e1c899; color: #75531a; }
+.question-number:hover { border-color: #6b9ac7; }
+.question-number[aria-current="step"] { box-shadow: inset 0 0 0 2px var(--blue); }
+.question-number.unanswered[aria-current="step"], .question-number.answered[aria-current="step"] { background: var(--blue); color: white; }
+.number-indicator { font-size: 10px; position: absolute; top: 2px; right: 4px; }
+
+.blue-bar {
+  margin: 0;
+  border-radius: 10px 10px 0 0;
+  background: var(--blue);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 680;
+  padding: 9px 17px;
+}
+.material-panel { margin-bottom: 13px; }
+.material-body { padding: 15px 18px 18px; }
+.material-block + .material-block { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px; }
+.instructions { margin: 0 0 13px; padding: 2px 3px; color: var(--muted); font-size: 14px; }
+.rich { line-height: 1.62; overflow-wrap: anywhere; }
+.rich p { margin: .65em 0; }
+.rich > :first-child { margin-top: 0; }
+.rich > :last-child { margin-bottom: 0; }
+.rich u { text-underline-offset: .15em; text-decoration-thickness: 1.4px; }
+.rich pre { font: inherit; white-space: pre-wrap; }
+.rich .table-scroll { max-width: 100%; overflow-x: auto; margin: 12px 0; }
+.rich table { border-collapse: collapse; width: 100%; font-size: 14px; }
+.rich th, .rich td { border: 1px solid #aebfd0; padding: 7px 9px; min-width: 60px; vertical-align: top; text-align: left; }
+.rich th { background: #eef4fb; }
+.rich .asset { margin: 12px auto; text-align: center; }
+.rich img { display: block; width: auto; height: auto; max-width: 100%; margin: 0 auto; }
+.rich figcaption { margin-top: 6px; color: var(--muted); font-size: 13px; }
+.rich details, .related-context {
+  border: 1px solid #dce8f2;
+  border-radius: 6px;
+  background: #f5f8fb;
+  padding: 8px 11px;
+  margin: 9px 0;
+}
+summary { cursor: pointer; color: var(--blue); font-weight: 640; }
+.rich .plain-text { white-space: pre-wrap; text-align: left; margin-top: 8px; }
+
+.question-panel { padding: 16px 18px 17px; }
+.question-title-row { display: flex; gap: 9px; align-items: center; margin-bottom: 7px; }
+.question-title-row h2 { margin: 0; color: var(--blue); font-size: 17px; }
+.original-number { color: var(--muted); font-size: 12px; }
+.question-stem { font-size: 17px; }
+.choice-set { margin: 12px 0 0; padding: 0; min-width: 0; border: 0; }
+#choices { display: grid; gap: 6px; }
+.choice {
+  display: grid;
+  grid-template-columns: 20px 23px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  min-height: 47px;
+  border: 1px solid #d7e2ec;
+  border-radius: 6px;
+  background: white;
+  padding: 10px 11px;
+}
+.choice.interactive { cursor: pointer; }
+.choice.interactive:hover { background: #f5f9fe; border-color: #abc9e5; }
+.choice.selected { background: #eef6ff; border-color: #8eb7df; }
+.choice.selected.correct { background: var(--correct-bg); border-color: #a8d3ba; }
+.choice.selected.incorrect { background: var(--wrong-bg); border-color: #e8b9be; }
+.choice.teacher-key { border-color: #91c2ab; background: #f0f9f3; }
+.choice input { width: 17px; height: 17px; margin: 4px 0 0; accent-color: var(--primary); }
+.choice input:focus-visible { outline: 2px solid #4286c8; outline-offset: 3px; }
+.choice .option-letter { color: var(--blue); font-weight: 700; line-height: 1.6; }
+.choice .option-content { min-width: 0; }
+.choice .option-content p:first-child { margin-top: 0; }
+.choice .option-content p:last-child { margin-bottom: 0; }
+.related-context { font-size: 14px; }
+.related-context ol { margin: 6px 0; padding-left: 22px; }
+.feedback {
+  margin: 12px 0 0;
+  border-radius: 6px;
+  padding: 9px 12px;
+  background: #f0f4f8;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 650;
+}
+.feedback.correct { background: var(--correct-bg); color: var(--correct); }
+.feedback.incorrect { background: var(--wrong-bg); color: var(--wrong); }
+.teacher-explanation {
+  margin-top: 13px;
+  padding: 12px 14px;
+  border: 1px solid #c6dcef;
+  border-radius: 8px;
+  background: #f1f7fd;
+  line-height: 1.65;
+}
+.teacher-explanation p { margin: 7px 0 0; white-space: pre-wrap; }
+.answer-label { color: var(--correct); font-weight: 700; }
+.teacher-note { color: #75531a; background: #fff7e7; padding: 7px 9px; border-radius: 5px; font-size: 13px; }
+.question-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 16px; padding-top: 13px; border-top: 1px solid #e5edf4; }
+.position-label { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+
+.history-panel { padding: 19px 20px; }
+.history-scroll { overflow-x: auto; margin-top: 14px; }
+.history-table { border-collapse: collapse; width: 100%; text-align: left; font-size: 14px; }
+.history-table th, .history-table td { padding: 10px 8px; border-bottom: 1px solid #e2ebf3; vertical-align: middle; }
+.history-table th { color: var(--muted); background: #f3f7fa; font-size: 13px; }
+.history-table td:not(:first-child) { white-space: nowrap; }
+.history-paper { color: var(--ink); font-weight: 640; }
+.history-paper-meta { display: block; color: var(--muted); font-size: 12px; margin-top: 3px; }
+.empty-history { color: var(--muted); margin: 16px 0 3px; }
+dialog { width: min(430px, calc(100vw - 36px)); border: 1px solid var(--line); border-radius: 11px; padding: 22px; color: var(--ink); box-shadow: 0 12px 35px #16334e33; }
+dialog::backdrop { background: #142a4280; }
+dialog h2 { margin: 0 0 8px; font-size: 21px; }
+dialog p { color: var(--muted); line-height: 1.6; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+@media (max-width: 850px) {
+  .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .number-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .site-header-inner { padding: 8px 12px; gap: 7px; }
+  .brand { gap: 7px; font-size: 15px; }
+  .brand-icon { width: 29px; height: 29px; flex-basis: 29px; }
+  .edition { padding: 3px 6px; font-size: 11px; }
+  .site-nav button { padding: 5px 7px; font-size: 12px; }
+  main { padding: 20px 12px 40px; }
+  .page-heading { margin-top: 4px; }
+  .setup-panel { padding: 16px; }
+  .filters, .range-controls { gap: 12px; }
+  .range-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .paper-field { grid-column: 1 / -1; }
+  .setup-actions { flex-wrap: wrap; }
+  .setup-actions .primary { width: 100%; }
+  .number-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
+  .progress-panel, .history-panel { padding: 13px 12px; }
+  .metrics { gap: 8px 16px; }
+  .metric { min-width: 58px; }
+  .metric-value { font-size: 20px; }
+  .legend { gap: 4px 8px; }
+  .material-body, .question-panel { padding: 12px; }
+  .question-stem { font-size: 16px; }
+  .button { padding-inline: 12px; }
+  .choice { padding-inline: 9px; grid-template-columns: 19px 19px minmax(0, 1fr); gap: 5px; }
+}
+@media (max-width: 355px) {
+  .brand-icon { display: none; }
+  .number-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <button class="brand" id="home-mark" type="button" aria-label="回到选题">
+        <svg class="brand-icon" viewBox="0 0 40 40" aria-hidden="true">
+          <rect width="40" height="40" rx="10" fill="currentColor"/>
+          <path d="M12 11h15a2 2 0 0 1 2 2v16H14a3 3 0 0 1-3-3V12a1 1 0 0 1 1-1Z" fill="none" stroke="white" stroke-width="1.7"/>
+          <path d="M11 25h18M16 16h8M16 20h6" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        <span>MAP Grade 6 在线练习</span>
+      </button>
+      <span class="edition" id="edition"></span>
+      <nav id="student-controls" class="site-nav" aria-label="主要导航" hidden>
+        <button id="nav-setup" type="button" aria-current="page">选题</button>
+        <button id="nav-history" type="button">练习记录</button><button id="change-student" type="button">更换学生</button>
+      </nav>
+    </div>
+  </header>
+  <main>
+
+    <section id="join-view" class="map-card map-gate" aria-labelledby="join-title">
+      <p class="kicker">MAP GRADE 6</p>
+      <h1 id="join-title">进入在线练习</h1>
+      <p class="map-muted">使用老师发来的链接或班级码，填写姓名拼音缩写即可开始。</p>
+      <form id="join-form" class="map-form">
+        <label>姓名拼音缩写 <input id="student-name" maxlength="16" placeholder="例如 HQ" autocapitalize="characters" required></label>
+        <label>班级码 <input id="class-code" maxlength="36" autocomplete="off" spellcheck="false" required></label>
+        <button class="map-button map-primary" id="join-button" type="submit">进入题库</button>
+      </form>
+      <p id="join-status" class="map-status" role="status"></p>
+    </section>
+    <p id="sync-status" class="map-status" role="status"></p>
+    <div id="practice-app" hidden>
+    <p id="storage-notice" class="storage-notice" role="status" hidden>当前浏览器无法写入本机记录，关闭页面前仍可继续练习。</p>
+
+    <section id="setup-view" aria-labelledby="setup-title">
+      <div class="page-heading">
+        <div>
+          <p class="kicker">MAP PRACTICE</p>
+          <h1 id="setup-title">选择练习</h1>
+          <p class="subtitle">按科目、年级和难度，找到要练习的原卷。</p>
+        </div>
+        <p id="bank-total" class="bank-total"></p>
+      </div>
+      <form id="setup-form" class="panel setup-panel">
+        <h2>练习范围</h2>
+        <div class="filters">
+          <label><span><b>01</b> 科目</span><select id="subject"></select></label>
+          <label><span><b>02</b> 年级</span><select id="grade"></select></label>
+          <label><span><b>03</b> 难度</span><select id="difficulty"></select></label>
+          <label class="paper-field"><span><b>04</b> Quiz 或 Test</span><select id="paper"></select></label>
+        </div>
+        <div class="range-controls" id="range-controls" hidden>
+          <label><span>每组题数</span><select id="set-size">
+            <option value="10">每 10 题一组</option>
+            <option value="20">每 20 题一组</option>
+            <option value="all">整份原卷</option>
+          </select></label>
+          <label><span>选择题段</span><select id="range"></select></label>
+        </div>
+        <div class="setup-actions">
+          <p id="selection-caption" class="selection-caption" aria-live="polite">请选择科目、年级、难度和原卷。</p>
+          <button id="start-quiz" type="submit" class="button primary" disabled>开始练习 <span aria-hidden="true">→</span></button>
+        </div>
+      </form>
+      <p class="local-note">作答进度自动同步给老师。使用当前浏览器继续上次练习。</p>
+    </section>
+
+    <section id="quiz-view" aria-labelledby="quiz-title" hidden>
+      <div class="breadcrumbs"><button id="back-to-setup" type="button">选题</button><span aria-hidden="true">›</span><span id="quiz-crumb"></span></div>
+      <div class="quiz-heading">
+        <div><h1 id="quiz-title"></h1><p id="quiz-meta" class="subtitle"></p></div>
+        <button id="submit-quiz" type="button" class="button primary">交卷</button>
+        <button id="retry-quiz" type="button" class="button secondary" hidden>再练一次</button>
+      </div>
+      <section class="panel progress-panel" aria-label="练习进度与题号">
+        <div id="progress-stats" class="metrics" aria-live="polite"></div>
+        <div class="number-toolbar">
+          <h2>题号</h2>
+          <div class="legend" id="status-legend"></div>
+          <button type="button" id="toggle-numbers" class="text-button" aria-expanded="true" aria-controls="number-grid">收起题号</button>
+        </div>
+        <div class="number-grid" id="number-grid"></div>
+      </section>
+      <div class="instructions rich" id="instructions" hidden></div>
+      <section class="panel material-panel" id="material-panel" aria-labelledby="material-title" hidden>
+        <h2 class="blue-bar" id="material-title">阅读材料</h2>
+        <div id="material-body" class="rich material-body"></div>
+      </section>
+      <section class="panel question-panel" id="question-panel" aria-labelledby="question-title">
+        <div class="question-title-row">
+          <h2 id="question-title" tabindex="-1"></h2>
+          <span id="original-number" class="original-number"></span>
+        </div>
+        <div id="question-stem" class="rich question-stem"></div>
+        <div id="related-questions"></div>
+        <fieldset class="choice-set">
+          <legend class="visually-hidden">选择一个答案</legend>
+          <div id="choices"></div>
+        </fieldset>
+        <p class="feedback" id="feedback" hidden></p>
+        <div id="teacher-content"></div>
+        <div class="question-actions">
+          <button type="button" id="previous-question" class="button secondary"><span aria-hidden="true">←</span> 上一题</button>
+          <span id="position-label" class="position-label"></span>
+          <button type="button" id="next-question" class="button primary">下一题 <span aria-hidden="true">→</span></button>
+        </div>
+      </section>
+    </section>
+
+    <section id="history-view" aria-labelledby="history-title" hidden>
+      <div class="page-heading">
+        <div><p class="kicker">PRACTICE HISTORY</p><h1 id="history-title">练习记录</h1><p class="subtitle">继续上次作答，或回顾已经交卷的练习。</p></div>
+        <button type="button" id="history-to-setup" class="button secondary">返回选题</button>
+      </div>
+      <section class="panel history-panel">
+        <div id="history-stats" class="metrics"></div>
+        <p id="empty-history" class="empty-history" hidden>完成或开始一次练习后，记录会出现在这里。</p>
+        <div class="history-scroll" id="history-table-wrapper" hidden>
+          <table class="history-table">
+            <thead><tr><th scope="col">原卷</th><th scope="col">题段</th><th scope="col">结果</th><th scope="col">时间</th><th scope="col">操作</th></tr></thead>
+            <tbody id="history-rows"></tbody>
+          </table>
+        </div>
+      </section>
+      <p class="local-note">这里显示当前学生在这个浏览器中的练习记录。</p>
+    </section>
+    </div>
+    <footer class="map-footer"><a href="作答记录-老师登录版本.html">老师入口</a></footer>
+  </main>
+
+  <dialog id="finish-dialog" aria-labelledby="finish-title">
+    <form method="dialog">
+      <h2 id="finish-title">现在交卷？</h2>
+      <p id="finish-message"></p>
+      <div class="dialog-actions">
+        <button type="submit" class="button secondary" value="cancel" autofocus>继续作答</button>
+        <button type="submit" class="button primary" value="submit">确认交卷</button>
+      </div>
+    </form>
+  </dialog>
+  <noscript><p class="storage-notice">请在允许 JavaScript 的浏览器中打开此文件。</p></noscript>
+  <script src="cloud.js"></script>
+  <script src="student-cloud.js"></script>
+  <script>"use strict";
+const MAP_CONFIG = {"url": "https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiZXhwIjozNjg2OTI1NzYzfQ.y45vSsbxFjV9k-psYujSR2YMtDOeZW_IDZS6eBlbRFc"};
+function startMapPractice(bank, cloud, student, initialPaperId) {
+"use strict";
+
+const papers = new Map(bank.papers.map(paper => [paper.id, paper]));
+const get = id => document.getElementById(id);
+const prefix = `map-g6-v1:${cloud.classCode}:${student}:`;
+const memory = new Map();
+const dateFormat = new Intl.DateTimeFormat("zh-CN", { dateStyle: "short", timeStyle: "short" });
+const statusText = { answered: "已答", unanswered: "未答", correct: "正确", incorrect: "错误", unscored: "不计分" };
+const statusIcon = { correct: "✓", incorrect: "×", unscored: "–" };
+let storageAvailable = true;
+let active = null;
+let opening = 0;
+let finishing = false;
+let availableSets = [];
+
+function node(tag, className = "", text = "") {
+  const element = document.createElement(tag);
+  if (className) element.className = className;
+  if (text) element.textContent = text;
+  return element;
+}
+
+function showStorageNotice() {
+  storageAvailable = false;
+  get("storage-notice").hidden = false;
+}
+
+try {
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (key && key.startsWith(prefix)) memory.set(key, localStorage.getItem(key));
+  }
+  const probe = prefix + "probe";
+  localStorage.setItem(probe, "1");
+  localStorage.removeItem(probe);
+} catch {
+  showStorageNotice();
+}
+
+window.addEventListener("storage", event => {
+  if (!event.key || !event.key.startsWith(prefix)) return;
+  if (event.newValue === null) memory.delete(event.key);
+  else memory.set(event.key, event.newValue);
+});
+
+function load(key) {
+  try {
+    return JSON.parse(memory.get(prefix + key) ?? "null");
+  } catch {
+    return null;
+  }
+}
+
+function save(key, value) {
+  const encoded = JSON.stringify(value);
+  memory.set(prefix + key, encoded);
+  if (!storageAvailable) return;
+  try {
+    localStorage.setItem(prefix + key, encoded);
+  } catch {
+    showStorageNotice();
+  }
+}
+
+function saveAttempt(record) {
+  record.revision += 1;
+  save("attempt:" + record.id, record);
+  cloud.save(record);
+}
+
+function attemptQuestions(record) {
+  const paper = papers.get(record.paperId);
+  if (!paper || !Array.isArray(record.questionIds) || !record.questionIds.length) return [];
+  const byId = new Map(paper.questions.map(question => [question.id, question]));
+  const questions = record.questionIds.map(id => byId.get(id));
+  return questions.every(Boolean) ? questions : [];
+}
+
+function records() {
+  const attempts = [];
+  for (const key of memory.keys()) {
+    if (!key.startsWith(prefix + "attempt:")) continue;
+    const record = load(key.slice(prefix.length));
+    if (!record?.id || !record.answers || !attemptQuestions(record).length) continue;
+    if (record.submittedAt && (!Array.isArray(record.marks) || record.marks.length !== record.questionIds.length)) continue;
+    attempts.push(record);
+  }
+  return attempts.sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+function paperTitle(paper) {
+  const domain = paper.domain === "Comprehensive" ? "综合" : paper.domain;
+  return `${domain} · ${paper.kind} ${paper.number}`;
+}
+
+function rangeLabel(questions) {
+  const first = questions[0].number;
+  const last = questions[questions.length - 1].number;
+  return first === last ? `原卷第 ${first} 题` : `原卷第 ${first}–${last} 题`;
+}
+
+function setsFor(paper, size) {
+  const questions = paper.questions;
+  const chunk = size === "all" || questions.length <= 10 ? questions.length : Number(size);
+  const sets = [];
+  for (let start = 0; start < questions.length; start += chunk) {
+    const items = questions.slice(start, start + chunk);
+    sets.push({ key: `${paper.id}:${items[0].number}-${items.at(-1).number}`, questions: items });
+  }
+  return sets;
+}
+
+function fillSelect(select, options, current, placeholder) {
+  const children = placeholder ? [new Option(placeholder, "")] : [];
+  for (const [value, label] of options) children.push(new Option(label, value));
+  select.replaceChildren(...children);
+  if (options.some(([value]) => value === current)) select.value = current;
+  select.disabled = options.length === 0;
+  return select.value;
+}
+
+const selection = { subject: "", grade: "", difficulty: "", paper: "", size: "10", range: "0", ...load("selection") };
+const filters = ["subject", "grade", "difficulty", "paper"];
+
+function renderSetup() {
+  const subjects = [...new Set(bank.papers.map(paper => paper.subject))];
+  selection.subject = fillSelect(get("subject"), subjects.map(subject => [subject, subject]), selection.subject, "选择科目");
+  const inSubject = bank.papers.filter(paper => paper.subject === selection.subject);
+  const grades = [...new Set(inSubject.map(paper => paper.grade))].sort((a, b) => a - b);
+  selection.grade = fillSelect(get("grade"), grades.map(grade => [String(grade), `Grade ${grade}`]), selection.grade, "选择年级");
+  const inGrade = inSubject.filter(paper => String(paper.grade) === selection.grade);
+  const levels = ["Basic", "Proficient", "Advanced"].filter(level => inGrade.some(paper => paper.difficulty === level));
+  selection.difficulty = fillSelect(get("difficulty"), levels.map(level => [level, level]), selection.difficulty, "选择难度");
+  const inLevel = inGrade.filter(paper => paper.difficulty === selection.difficulty);
+  selection.paper = fillSelect(get("paper"), inLevel.map(paper => [
+    paper.id, `${paperTitle(paper)}（${paper.questions.length} 题）`,
+  ]), selection.paper, "选择原卷");
+
+  const paper = papers.get(selection.paper);
+  const button = get("start-quiz");
+  get("range-controls").hidden = !paper || paper.questions.length <= 10;
+  button.disabled = !paper;
+  if (!paper) {
+    availableSets = [];
+    get("selection-caption").textContent = "请选择科目、年级、难度和原卷。";
+    button.textContent = "开始练习 →";
+    return;
+  }
+  if (!["10", "20", "all"].includes(selection.size)) selection.size = "10";
+  get("set-size").value = selection.size;
+  availableSets = setsFor(paper, selection.size);
+  selection.range = fillSelect(get("range"), availableSets.map((set, index) => [
+    String(index), `${rangeLabel(set.questions)} · ${set.questions.length} 题`,
+  ]), selection.range, "");
+  const set = availableSets[Number(selection.range)];
+  const saved = records().find(record => record.setKey === set.key && !record.submittedAt);
+  get("selection-caption").textContent = saved
+    ? `${set.questions.length} 题 · 已保存 ${Object.keys(saved.answers).length} 题的作答进度`
+    : `${rangeLabel(set.questions)} · 共 ${set.questions.length} 题`;
+  button.textContent = saved ? "继续练习 →" : "开始练习 →";
+}
+
+function showView(name) {
+  if (name !== "quiz") { opening += 1; cloud.show(null); }
+  for (const view of ["setup", "quiz", "history"]) get(view + "-view").hidden = view !== name;
+  for (const view of ["setup", "history"]) {
+    if (view === name) get("nav-" + view).setAttribute("aria-current", "page");
+    else get("nav-" + view).removeAttribute("aria-current");
+  }
+  window.scrollTo(0, 0);
+}
+
+function showSetup() {
+  renderSetup();
+  showView("setup");
+}
+
+function newAttempt(paper, set) {
+  const now = Date.now();
+  return {
+    id: crypto.randomUUID(),
+    token: crypto.randomUUID(),
+    revision: 0,
+    paperId: paper.id,
+    setKey: set.key,
+    questionIds: set.questions.map(question => question.id),
+    answers: {},
+    index: 0,
+    startedAt: now,
+    updatedAt: now,
+    submittedAt: null,
+  };
+}
+
+async function openAttempt(record) {
+  const request = ++opening;
+  const status = get("sync-status");
+  status.textContent = "正在加载原卷…";
+  let paper;
+  try {
+    const result = await cloud.paper(record.paperId);
+    if (request !== opening) return;
+    paper = result.paper;
+    Object.assign(bank.images, result.images);
+    papers.set(paper.id, paper);
+  } catch (error) {
+    if (request === opening) status.textContent = mapMessage(error);
+    return;
+  }
+  const questions = attemptQuestions(record);
+  if (!questions.length) return;
+  const index = record.submittedAt ? 0 : Math.max(0, Math.min(record.index || 0, questions.length - 1));
+  active = { record, paper, questions, index };
+  get("quiz-crumb").textContent = `${paper.subject} · Grade ${paper.grade}`;
+  get("quiz-title").textContent = paperTitle(paper);
+  setNumberGrid(true);
+  get("instructions").hidden = !paper.instructions;
+  setRich(get("instructions"), paper.instructions);
+  showView("quiz");
+  cloud.show(record);
+  if (!record.submittedAt && !record.submitRequested) cloud.save(record);
+  renderQuiz();
+}
+
+function currentQuestion() {
+  return active.questions[active.index];
+}
+
+
+function tally(record) {
+  const unscored = record.marks.filter(mark => mark === "unscored").length;
+  const total = record.questionIds.length - unscored;
+  const correct = record.marks.filter(mark => mark === "correct").length;
+  const incorrect = record.marks.filter(mark => mark === "incorrect").length;
+  return { total, correct, incorrect, unanswered: total - correct - incorrect, unscored };
+}
+
+function percent(correct, total) {
+  return total ? `${Math.round(1000 * correct / total) / 10}%` : "—";
+}
+
+function metrics(element, values) {
+  element.replaceChildren(...values.map(([label, value, modifier]) => {
+    const item = node("div", "metric" + (modifier ? " " + modifier : ""));
+    item.append(node("span", "metric-label", label), node("span", "metric-value", String(value)));
+    return item;
+  }));
+}
+
+function renderProgress() {
+  const { record, questions, index } = active;
+  const reviewed = Boolean(record.submittedAt);
+  const answered = questions.filter(q => record.answers[q.id]).length;
+  if (reviewed) {
+    const score = tally(record);
+    metrics(get("progress-stats"), [
+      ["答对", `${score.correct} / ${score.total}`, "positive"],
+      ["正确率", percent(score.correct, score.total), "positive"],
+      ["答错", score.incorrect, "negative"],
+      ["未答", score.unanswered],
+      ...(score.unscored ? [["不计分", score.unscored]] : []),
+    ]);
+  } else {
+    metrics(get("progress-stats"), [["已作答", `${answered} / ${questions.length}`], ["待作答", questions.length - answered]]);
+  }
+  const states = reviewed ? ["correct", "incorrect", "unanswered"] : ["answered", "unanswered"];
+  if (reviewed && record.marks.includes("unscored")) states.push("unscored");
+  get("status-legend").replaceChildren(...states.map(status => {
+    const item = node("span", "legend-item");
+    const swatch = node("span", "swatch " + status);
+    swatch.setAttribute("aria-hidden", "true");
+    item.append(swatch, node("span", "", statusText[status]));
+    return item;
+  }));
+  get("number-grid").replaceChildren(...questions.map((question, position) => {
+    const status = reviewed ? record.marks[position] : record.answers[question.id] ? "answered" : "unanswered";
+    const button = node("button", "question-number " + status, String(position + 1));
+    button.type = "button";
+    button.setAttribute("aria-label", `第 ${position + 1} 题，${statusText[status]}`);
+    if (position === index) button.setAttribute("aria-current", "step");
+    if (statusIcon[status]) {
+      const indicator = node("span", "number-indicator", statusIcon[status]);
+      indicator.setAttribute("aria-hidden", "true");
+      button.append(indicator);
+    }
+    button.addEventListener("click", () => goTo(position));
+    return button;
+  }));
+}
+
+function setRich(element, markup) {
+  // All fragments pass through the OCR exporter's allowlist at build time.
+  element.innerHTML = markup;
+  for (const image of element.querySelectorAll("img[data-image]")) {
+    image.src = bank.images[image.dataset.image];
+  }
+  return element;
+}
+
+function renderMaterials(question) {
+  const holder = get("material-body");
+  holder.replaceChildren(...question.materials.map(id => setRich(node("div", "material-block"), active.paper.materials[id])));
+  get("material-panel").hidden = !question.materials.length;
+}
+
+function renderReferences(question) {
+  const holder = get("related-questions");
+  holder.replaceChildren();
+  for (const number of question.references) {
+    const index = active.questions.findIndex(item => item.number === number);
+    if (index >= 0) {
+      const button = node("button", "text-button", `查看原卷第 ${number} 题`);
+      button.type = "button";
+      button.addEventListener("click", () => goTo(index));
+      holder.append(button);
+      continue;
+    }
+    const reference = active.paper.questions.find(item => item.number === number);
+    const detail = node("details", "related-context rich");
+    detail.append(node("summary", "", `查看关联的原卷第 ${number} 题`), setRich(node("div"), reference.stem));
+    for (const materialId of reference.materials) {
+      if (!question.materials.includes(materialId)) detail.append(setRich(node("div", "material-block"), active.paper.materials[materialId]));
+    }
+    const options = node("ol");
+    options.type = "A";
+    for (const [, markup] of reference.options) options.append(setRich(node("li"), markup));
+    detail.append(options);
+    holder.append(detail);
+  }
+}
+
+function renderChoices(question) {
+  const { record, index } = active;
+  const reviewed = Boolean(record.submittedAt);
+  const chosen = record.answers[question.id];
+  const holder = get("choices");
+  holder.replaceChildren(...question.options.map(([label, markup], optionIndex) => {
+    const row = node("div", "choice" + (reviewed ? "" : " interactive"));
+    const input = node("input");
+    input.type = "radio";
+    input.name = "answer";
+    input.value = label;
+    input.checked = chosen === label;
+    input.disabled = reviewed || Boolean(record.submitRequested);
+    const letter = node("span", "option-letter", label + ".");
+    const body = setRich(node("div", "option-content rich"), markup);
+    letter.id = `option-label-${optionIndex}`;
+    body.id = `option-text-${optionIndex}`;
+    input.setAttribute("aria-labelledby", `${letter.id} ${body.id}`);
+    row.classList.toggle("selected", input.checked);
+    if (reviewed && input.checked) row.classList.add(record.marks[index]);
+    if (!input.disabled) {
+      input.addEventListener("change", () => {
+        record.answers[question.id] = label;
+        record.updatedAt = Date.now();
+        saveAttempt(record);
+        for (const choice of holder.children) choice.classList.toggle("selected", choice.querySelector("input").checked);
+        renderProgress();
+      });
+      row.addEventListener("click", event => {
+        if (event.target.closest("input,button,summary,details,a")) return;
+        input.focus();
+        input.click();
+      });
+    }
+    row.append(input, letter, body);
+    return row;
+  }));
+}
+
+
+function renderQuiz() {
+  const { record, paper, questions, index } = active;
+  const reviewed = Boolean(record.submittedAt);
+  const question = currentQuestion();
+  get("quiz-meta").textContent = `${paper.difficulty} · ${rangeLabel(questions)} · ${reviewed ? "结果回顾" : "练习中"}`;
+  get("submit-quiz").hidden = reviewed;
+  get("submit-quiz").disabled = finishing;
+  get("submit-quiz").textContent = record.submitRequested ? "重试交卷" : "交卷";
+  get("retry-quiz").hidden = !reviewed;
+  get("question-title").textContent = `第 ${index + 1} 题`;
+  get("original-number").textContent = question.number === index + 1 ? "" : `原卷第 ${question.number} 题`;
+  get("position-label").textContent = `${index + 1} / ${questions.length}`;
+  get("previous-question").disabled = index === 0;
+  get("next-question").textContent = index < questions.length - 1 ? "下一题 →" : reviewed ? "返回选题" : "交卷";
+  const feedback = get("feedback");
+  feedback.hidden = !reviewed;
+  if (reviewed) {
+    const status = record.marks[index];
+    feedback.className = "feedback " + status;
+    if (status === "unanswered") feedback.textContent = "本题未作答";
+    else if (status === "unscored") feedback.textContent = "本题不计分";
+    else feedback.textContent = `我的答案 ${record.answers[question.id]} · ${statusText[status]}`;
+  }
+  renderProgress();
+  renderMaterials(question);
+  setRich(get("question-stem"), question.stem);
+  renderReferences(question);
+  renderChoices(question);
+}
+
+function goTo(index) {
+  if (index < 0 || index >= active.questions.length) return;
+  active.index = index;
+  if (!active.record.submittedAt && !active.record.submitRequested) {
+    active.record.index = index;
+    active.record.updatedAt = Date.now();
+    saveAttempt(active.record);
+  }
+  renderQuiz();
+  get("question-title").focus({ preventScroll: true });
+  window.scrollTo(0, 0);
+}
+
+function setNumberGrid(expanded) {
+  get("number-grid").hidden = !expanded;
+  get("toggle-numbers").setAttribute("aria-expanded", String(expanded));
+  get("toggle-numbers").textContent = expanded ? "收起题号" : "展开题号";
+}
+
+async function finishAttempt() {
+  const { record } = active;
+  if (record.submittedAt || finishing) return;
+  if (!record.submitRequested) {
+    record.submitRequested = true;
+    record.revision += 1;
+    save("attempt:" + record.id, record);
+  }
+  finishing = true;
+  renderQuiz();
+  try {
+    const result = await cloud.submit(record);
+    record.marks = result.marks;
+    record.submittedAt = Date.parse(result.submitted_at);
+    record.updatedAt = record.submittedAt;
+    delete record.submitRequested;
+    save("attempt:" + record.id, record);
+    if (active.record.id === record.id) {
+      active.record = record;
+      active.index = 0;
+      setNumberGrid(true);
+    }
+  } catch {
+    // Keep the same attempt ID and revision so an unacknowledged submit can be retried.
+  } finally {
+    finishing = false;
+    if (!get("quiz-view").hidden) renderQuiz();
+    else if (!get("history-view").hidden) showHistory();
+  }
+}
+
+function requestFinish() {
+  if (finishing) return;
+  if (active.record.submitRequested) { finishAttempt(); return; }
+  const answered = active.questions.filter(question => active.record.answers[question.id]).length;
+  const unanswered = active.questions.length - answered;
+  if (!unanswered) {
+    finishAttempt();
+    return;
+  }
+  const dialog = get("finish-dialog");
+  get("finish-message").textContent = `已作答 ${answered} 题，还有 ${unanswered} 题未答。确认交卷后，空题会显示为未答。`;
+  dialog.returnValue = "cancel";
+  dialog.showModal();
+}
+
+function showHistory() {
+  const history = records();
+  const completed = history.filter(record => record.submittedAt);
+  const correct = completed.reduce((sum, record) => sum + tally(record).correct, 0);
+  const total = completed.reduce((sum, record) => sum + tally(record).total, 0);
+  metrics(get("history-stats"), [
+    ["已完成", `${completed.length} 次`],
+    ["累计答对", `${correct} / ${total}`, "positive"],
+    ["累计正确率", percent(correct, total), "positive"],
+  ]);
+  get("empty-history").hidden = history.length > 0;
+  get("history-table-wrapper").hidden = !history.length;
+  get("history-rows").replaceChildren(...history.map(record => {
+    const paper = papers.get(record.paperId);
+    const questions = attemptQuestions(record);
+    const name = node("td");
+    name.append(node("span", "history-paper", paperTitle(paper)), node("span", "history-paper-meta", `${paper.subject} · Grade ${paper.grade} · ${paper.difficulty}`));
+    const score = record.submittedAt ? tally(record) : null;
+    const result = score ? `${score.correct} / ${score.total} · ${percent(score.correct, score.total)}` : `进行中 · ${Object.keys(record.answers).length} / ${questions.length}`;
+    const action = node("td");
+    const button = node("button", "button secondary", score ? "查看结果" : "继续练习");
+    button.type = "button";
+    button.addEventListener("click", () => openAttempt(record));
+    action.append(button);
+    const row = node("tr");
+    row.append(name, node("td", "", rangeLabel(questions)), node("td", "", result), node("td", "", dateFormat.format(record.updatedAt)), action);
+    return row;
+  }));
+  showView("history");
+}
+
+for (const id of ["home-mark", "nav-setup", "back-to-setup", "history-to-setup"]) get(id).addEventListener("click", showSetup);
+get("nav-history").addEventListener("click", showHistory);
+filters.forEach((field, index) => get(field).addEventListener("change", event => {
+  selection[field] = event.target.value;
+  for (const next of filters.slice(index + 1)) selection[next] = "";
+  selection.range = "0";
+  renderSetup();
+  save("selection", selection);
+}));
+get("set-size").addEventListener("change", event => {
+  selection.size = event.target.value;
+  selection.range = "0";
+  renderSetup();
+  save("selection", selection);
+});
+get("range").addEventListener("change", event => {
+  selection.range = event.target.value;
+  renderSetup();
+  save("selection", selection);
+});
+get("setup-form").addEventListener("submit", event => {
+  event.preventDefault();
+  const paper = papers.get(selection.paper);
+  const set = availableSets[Number(selection.range)];
+  if (!paper || !set) return;
+  const saved = records().find(record => record.setKey === set.key && !record.submittedAt);
+  const record = saved || newAttempt(paper, set);
+  if (!saved) saveAttempt(record);
+  save("selection", selection);
+  openAttempt(record);
+});
+get("toggle-numbers").addEventListener("click", () => setNumberGrid(get("number-grid").hidden));
+get("submit-quiz").addEventListener("click", requestFinish);
+get("finish-dialog").addEventListener("close", event => {
+  if (event.target.returnValue === "submit") finishAttempt();
+});
+get("previous-question").addEventListener("click", () => goTo(active.index - 1));
+get("next-question").addEventListener("click", () => {
+  if (active.index < active.questions.length - 1) goTo(active.index + 1);
+  else if (active.record.submittedAt) showSetup();
+  else requestFinish();
+});
+get("retry-quiz").addEventListener("click", () => {
+  const record = newAttempt(active.paper, { key: active.record.setKey, questions: active.questions });
+  saveAttempt(record);
+  openAttempt(record);
+});
+
+const linkedPaper = papers.get(initialPaperId);
+if (linkedPaper) Object.assign(selection, {
+  subject: linkedPaper.subject,
+  grade: String(linkedPaper.grade),
+  difficulty: linkedPaper.difficulty,
+  paper: linkedPaper.id,
+  range: "0",
+});
+get("bank-total").textContent = `${bank.papers.length} 份原卷 · ${bank.papers.reduce((sum, paper) => sum + paper.questions.length, 0)} 道题`;
+showSetup();
+}
+mountMapStudent();</script>
+</body>
+</html>

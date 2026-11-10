@@ -1,0 +1,24 @@
+# MAP Grade 6 在线练习
+
+- [学生入口](https://baiiugun.github.io/map-grade6-practice/)
+- [作答记录与课堂讲义 · 老师登录版](https://baiiugun.github.io/map-grade6-practice/作答记录-老师登录版本.html)
+
+## 首次启用
+
+1. 登录 DET 使用的火山引擎 Supabase Studio。打开 **SQL Editor → New query**，粘贴 [setup.sql](setup.sql) 的全文，点 **Run**。看到成功提示后继续。
+2. 打开老师入口，用查看 DET 作答记录的邮箱和密码登录。在「首次使用」里选择电脑上的 **MAP_本地练习_老师版.html**，点「导入 Supabase」。页面提示 **41 份原卷、629 道题**后即可开始。
+3. 点「复制学生链接」，把带班级码的链接发给学生。也可以先选一份原卷，再点「复制当前原卷链接」。学生输入姓名拼音缩写即可练习。重名时可加数字，例如 HQ2。
+
+导入中断时可以用同一文件重试。重新运行初始化脚本会保留既有班级码、原卷和作答。
+
+## 上课时怎么用
+
+- 学生答题时网页会保存进度。老师页在「实时作答」中显示已答题数，点「在讲义中看」可以查看原答。
+- 学生交卷后可看自动判定。老师可逐题改判、写讲解点评。原答单独保留，批改仅在老师端显示。
+- 点「返回纯讲义」可隐藏学生原答和点评，再投屏讲题。做题记录可在同一浏览器继续。
+
+## 维护
+
+GitHub Pages 从 `main` 的 `/docs` 发布页面。MAP 数据在现有 Supabase 的 `map_g6_*` 表中，题库由老师页读取本地讲义后逐卷导入。
+
+本地调整 MAP 页面模板后，在本项目目录运行 `python build.py --det-page "<DET 项目中的 wp.html 路径>"`，生成学生入口和老师入口。在线逻辑位于 `docs/cloud.js`、`docs/student-cloud.js` 和 `docs/teacher-cloud.js`。
