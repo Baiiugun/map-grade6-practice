@@ -13,6 +13,12 @@
 
 学生可以先选年级，再按科目、难度和原卷选题。老师用「讲义年级」切换。当前提供 Grade 6 题库，其他年级导入后会自动开放。在老师页展开「导入题库」，选择带对应年级信息的本地老师版 HTML 即可继续添加原卷。
 
+## Reading 学习资源
+
+选择年级和 Reading 后，可以打开能力知识图谱。图谱依据 MAP Grade 6 Reading 的 306 道题整理，共 8 个模块、38 项能力；图谱题目索引可打开在线原卷的选题入口。
+
+Grade 6 的「补充阅读练习」直接打开《Spectrum Reading Grade 6》的能力选择。75 篇文章、248 道题覆盖 35 项可练能力。学生点选即可查看正误、中文解析和原文依据，作答进度保存在当前浏览器。其他年级的入口随对应练习开放。
+
 ## 上课时怎么用
 
 - 学生答题时网页会保存进度。老师页在「实时作答」中显示已答题数，点「在讲义中看」可以查看原答。
@@ -23,4 +29,8 @@
 
 GitHub Pages 从 `main` 的 `/docs` 发布页面。原网址和 Supabase 的 `map_g6_*` 表名沿用首次部署时的名称，以便已有链接和作答继续可用。题库由老师页读取本地讲义后逐卷导入。
 
-本地调整 MAP 页面模板后，在本项目目录运行 `python build.py --det-page "<DET 项目中的 wp.html 路径>"`，生成学生入口和老师入口。在线逻辑位于 `docs/cloud.js`、`docs/student-cloud.js` 和 `docs/teacher-cloud.js`。
+本地调整 MAP 页面模板后，在本项目目录运行 `python build.py --det-page "<DET 项目中的 wp.html 路径>"`，生成学生入口和老师入口。只重建学生入口和两份 Reading 页面时，在该命令后加 `--student-only`。在线逻辑位于 `docs/cloud.js`、`docs/student-cloud.js` 和 `docs/teacher-cloud.js`。
+
+Reading 的两份页面由 `build.py` 生成，发布在 `docs/reading/`。知识图谱读取备课目录中的 `MAP_Reading_能力知识图谱.html`，Grade 6 练习读取同目录下 `Reading-补充阅读及练习` 的 `src/` 与 `data/reading6.json`。在线版使用可作答题和解析，原书配套题档案可在本地源项目查看。接手与历次验证在补充练习源项目的《当前进度.md》。
+
+新增年级时，先生成该年级的学生练习页并验证直达能力选择，再在 `docs/student-cloud.js` 的 `MAP_READING_SUPPLEMENTS` 登记该年级与实际页面路由，重建并验证学生入口。原卷与补充练习使用各自的入口，Grade 7 对应 Grade 7 的材料。

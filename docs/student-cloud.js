@@ -1,5 +1,26 @@
 "use strict";
 
+const MAP_READING_SUPPLEMENTS = new Map([
+  ["6", "reading/grade-6.html#/grade/6/skills"],
+]);
+
+function renderMapReadingResources(grade, subject) {
+  const visible = subject === "Reading";
+  const route = visible ? MAP_READING_SUPPLEMENTS.get(grade) : undefined;
+  const link = document.getElementById("reading-supplement");
+
+  document.getElementById("reading-resources").hidden = !visible;
+  link.hidden = !route;
+  if (route) {
+    link.href = route;
+    link.textContent = "Grade " + grade + " 补充阅读练习";
+  } else {
+    link.removeAttribute("href");
+  }
+  document.getElementById("reading-supplement-status").textContent =
+    visible && !route ? "Grade " + grade + " 暂无补充阅读练习。" : "";
+}
+
 function mapStudentCloud(classCode, student) {
   const queues = new Map();
   const loaded = new Map();

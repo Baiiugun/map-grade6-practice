@@ -7,11 +7,13 @@ import html
 import json
 import re
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 
 ROOT = Path(__file__).resolve().parent
 SOURCE = ROOT.parent / "practice_src"
 SITE = ROOT / "docs"
+MAP_MATERIALS = ROOT.parent.parent
+READING_SOURCE = MAP_MATERIALS / "Reading-补充阅读及练习"
 
 
 def read(path):
@@ -47,6 +49,16 @@ STUDENT_GATE = """
     </section>
     <p id="sync-status" class="map-status" role="status"></p>
     <div id="practice-app" hidden>
+"""
+
+READING_RESOURCES = """      <section id="reading-resources" class="map-card" aria-labelledby="reading-resources-title" hidden>
+        <h2 id="reading-resources-title">Reading 学习资源</h2>
+        <div class="map-toolbar">
+          <a class="map-button" href="reading/skills.html" target="_blank" rel="noopener">能力知识图谱（Grade 6）</a>
+          <a class="map-button" id="reading-supplement" target="_blank" rel="noopener" hidden>补充阅读练习</a>
+        </div>
+        <p class="map-status" id="reading-supplement-status" role="status"></p>
+      </section>
 """
 
 TEACHER_WORKSPACE = """
@@ -140,7 +152,8 @@ def student_template():
     template = swap(template, '<button id="nav-history" type="button">练习记录</button>', '<button id="nav-history" type="button">练习记录</button><button id="change-student" type="button">更换学生</button>')
     template = swap(template, "  <main>\n", "  <main>\n" + STUDENT_GATE)
     template = swap(template, "  </main>", '    </div>\n    <footer class="map-footer"><a href="作答记录-老师登录版本.html">老师入口</a></footer>\n  </main>')
-    template = swap(template, "作答进度和练习记录保存在当前浏览器。", "作答进度自动同步给老师。使用当前浏览器继续上次练习。")
+    template = swap(template, '      <p class="local-note">作答进度和练习记录保存在当前浏览器。</p>',
+                    READING_RESOURCES + '      <p class="local-note">MAP 原卷的作答进度自动同步给老师。使用当前浏览器继续上次练习。</p>')
     return swap(template, "这里显示当前浏览器中这份 HTML 的练习记录。", "这里显示当前学生在这个浏览器中的练习记录。")
 
 
@@ -157,13 +170,15 @@ def student_script():
   selection.grade = fillSelect(get("grade"), grades.map(grade => [String(grade), `Grade ${grade}`]), selection.grade, "选择年级");
   const inGrade = inSubject.filter(paper => String(paper.grade) === selection.grade);''', '''  selection.grade = fillSelect(get("grade"), mapGradeOptions(bank.papers), selection.grade, "选择年级");
   const inGrade = bank.papers.filter(paper => String(paper.grade) === selection.grade);
-  const subjects = [...new Set(inGrade.map(paper => paper.subject))];
-  selection.subject = fillSelect(get("subject"), subjects.map(subject => [subject, subject]), selection.subject, "选择科目");
+  const subjects = new Set(inGrade.map(paper => paper.subject));
+  if (MAP_READING_SUPPLEMENTS.has(selection.grade)) subjects.add("Reading");
+  selection.subject = fillSelect(get("subject"), [...subjects].map(subject => [subject, subject]), selection.subject, "选择科目");
+  renderMapReadingResources(selection.grade, selection.subject);
   const inSubject = inGrade.filter(paper => paper.subject === selection.subject);''')
     source = swap(source, '  const levels = ["Basic", "Proficient", "Advanced"].filter(level => inGrade.some', '  const levels = ["Basic", "Proficient", "Advanced"].filter(level => inSubject.some')
     source = swap(source, "  const inLevel = inGrade.filter(", "  const inLevel = inSubject.filter(")
     source = swap(source, '    get("selection-caption").textContent = "请选择科目、年级、难度和原卷。";', '''    get("selection-caption").textContent = selection.grade && !inGrade.length
-      ? `Grade ${selection.grade} 暂无题库，请选择已开放的年级。`
+      ? `Grade ${selection.grade} 暂无 MAP 原卷。`
       : "请选择年级、科目、难度和原卷。";''')
     source = swap(source, "let active = null;", "let active = null;\nlet opening = 0;\nlet finishing = false;")
     source = swap(source, 'function showView(name) {\n', 'function showView(name) {\n  if (name !== "quiz") { opening += 1; cloud.show(null); }\n')
@@ -413,9 +428,77 @@ def build(filename, name, title, template, script, config):
     (SITE / filename).write_text(template, encoding="utf-8", newline="\n")
 
 
+def reading_graph():
+    page = read(MAP_MATERIALS / "MAP_Reading_能力知识图谱.html")
+    teacher_filename = "MAP_本地练习_老师版.html"
+    teacher_url = quote(teacher_filename)
+    markdown_url = quote("MAP_Reading_能力知识图谱.md")
+    teacher_link = f'<a href="{teacher_url}" target="_blank" rel="noopener">'
+    markdown_link = f'<a href="{markdown_url}" target="_blank" rel="noopener">'
+    for before, after in (
+        ("MAP G6 / TEACHER’S READING MAP", "MAP G6 / READING SKILLS"),
+        (teacher_link + "查看老师版原卷 ↗</a>", '<a href="../">返回 MAP 在线练习</a>'),
+        (markdown_link + "Markdown 版 ↗</a>", '<a href="grade-6.html#/grade/6/skills">Grade 6 补充练习</a>'),
+        (f'。也可阅读同文件夹的 <a href="{markdown_url}">Markdown 完整版</a>。', "。"),
+        ("依据本地老师版 Reading 整理", "依据 Grade 6 MAP Reading 题库整理"),
+        (teacher_link + "老师版原卷</a>", '<a href="../">MAP 在线练习</a>'),
+        (f'"sourceName":"{teacher_filename}","sourceHref":"{teacher_url}",', ""),
+        ("return DATA.sourceHref+'#'+q.paperId;", "return '../#paper='+encodeURIComponent(q.paperId);"),
+    ):
+        page = swap(page, before, after)
+    return page
+
+
+def reading_grade_6():
+    # Reuse the existing practice UI and published question set from their source.
+    corpus = json.loads(read(READING_SOURCE / "data" / "reading6.json"))
+    data = {key: corpus[key] for key in ("version", "grades", "modules", "skills", "passages", "questions")}
+    if [grade["grade"] for grade in data["grades"] if grade["ready"]] != [6]:
+        raise ValueError("The Grade 6 page needs the completed Spectrum Reading Grade 6 corpus.")
+    for passage in data["passages"]:
+        del passage["originalQuestions"]
+
+    source = READING_SOURCE / "src"
+    shell = read(source / "shell.html")
+    shell = swap(shell, '<button type="button" class="brand" data-action="levels" aria-label="返回级别选择">',
+                 '<a class="brand" href="../" aria-label="返回 MAP 在线练习">')
+    shell = swap(shell, '</small></span></button><nav class="steps"', '</small></span></a><nav class="steps"')
+    noscript = re.search(r'<noscript>.*?</noscript>', shell).group()
+    shell = swap(shell, noscript, '<noscript><p class="noscript">此练习需要启用 JavaScript。</p></noscript>')
+
+    app = read(source / "app.js")
+    app = swap(app, "function currentRoute(){const a",
+               "function currentRoute(){if(!location.hash)return {view:'map'};const a")
+    app = swap(app, '<button class="back-link" type="button" data-action="levels">← 重新选择级别</button>',
+               '<a class="back-link" href="../">← 返回 MAP 在线练习</a>')
+    app = swap(app, """<a href="'+encodeURI(DATA.mappingFile)+'" target="_blank" rel="noopener">篇章与题型映射 ↗</a>""",
+               '<a href="skills.html">能力知识图谱</a>')
+    pdf_link = """<a href="'+esc(DATA.book.pdfHref+'#page='+p.pdfPage)+'" target="_blank" rel="noopener" title="PDF 阅读器第 '+p.pdfPage+' 页">原 PDF ↗</a>"""
+    app = swap(app, pdf_link, "")
+    archive = next(line for line in app.splitlines(keepends=True) if line.startswith("function archiveMarkup(p){"))
+    app = swap(app, archive, "")
+    app = swap(app, "+archiveMarkup(p)+", "+")
+    app = swap(app, "if(b.dataset.archiveSkill){navigate(practiceLink(b.dataset.archiveSkill,b.dataset.archivePage));return;}", "")
+
+    embedded = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", r"<\/")
+    css = read(source / "styles.css") + "\n.brand { text-decoration: none; }\n"
+    return swap(swap(swap(shell, "__STYLES__", css), "__DATA__", embedded), "__APP__", app)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--det-page", type=Path, required=True, help="Path to the existing DET wp.html")
-    config = public_config(parser.parse_args().det_page)
-    build("index.html", "practice", "MAP 在线练习", student_template(), student_script(), config)
-    build("作答记录-老师登录版本.html", "teacher", "MAP 作答记录 · 老师登录版本", teacher_template(), teacher_script(), config)
+    parser.add_argument("--student-only", action="store_true", help="Build the student entry and Reading resources.")
+    args = parser.parse_args()
+    config = public_config(args.det_page)
+    student_page = (student_template(), student_script())
+    reading_pages = {"skills.html": reading_graph(), "grade-6.html": reading_grade_6()}
+    teacher_page = None if args.student_only else (teacher_template(), teacher_script())
+
+    build("index.html", "practice", "MAP 在线练习", *student_page, config)
+    reading_site = SITE / "reading"
+    reading_site.mkdir(exist_ok=True)
+    for name, page in reading_pages.items():
+        (reading_site / name).write_text(page, encoding="utf-8", newline="\n")
+    if teacher_page:
+        build("作答记录-老师登录版本.html", "teacher", "MAP 作答记录 · 老师登录版本", *teacher_page, config)

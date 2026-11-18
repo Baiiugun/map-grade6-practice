@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-+DnAtiuUiAlMLpJbTqrK6viB/yLtBjqwYCCfegLzuEc=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-aqnp6hCfJtVog5ZNc5+97Sr6TIoFfAhOLg9N3iKTwuc=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
   <meta name="referrer" content="no-referrer">
   <link rel="stylesheet" href="cloud.css?v=02e1bbf6dfc3">
   <title>MAP 在线练习</title>
@@ -447,7 +447,15 @@ dialog p { color: var(--muted); line-height: 1.6; }
           <button id="start-quiz" type="submit" class="button primary" disabled>开始练习 <span aria-hidden="true">→</span></button>
         </div>
       </form>
-      <p class="local-note">作答进度自动同步给老师。使用当前浏览器继续上次练习。</p>
+      <section id="reading-resources" class="map-card" aria-labelledby="reading-resources-title" hidden>
+        <h2 id="reading-resources-title">Reading 学习资源</h2>
+        <div class="map-toolbar">
+          <a class="map-button" href="reading/skills.html" target="_blank" rel="noopener">能力知识图谱（Grade 6）</a>
+          <a class="map-button" id="reading-supplement" target="_blank" rel="noopener" hidden>补充阅读练习</a>
+        </div>
+        <p class="map-status" id="reading-supplement-status" role="status"></p>
+      </section>
+      <p class="local-note">MAP 原卷的作答进度自动同步给老师。使用当前浏览器继续上次练习。</p>
     </section>
 
     <section id="quiz-view" aria-labelledby="quiz-title" hidden>
@@ -525,7 +533,7 @@ dialog p { color: var(--muted); line-height: 1.6; }
   </dialog>
   <noscript><p class="storage-notice">请在允许 JavaScript 的浏览器中打开此文件。</p></noscript>
   <script src="cloud.js?v=07b0eb7a44f7"></script>
-  <script src="student-cloud.js?v=c8d725875bf4"></script>
+  <script src="student-cloud.js?v=bfe5c425d53b"></script>
   <script>"use strict";
 const MAP_CONFIG = {"url": "https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiZXhwIjozNjg2OTI1NzYzfQ.y45vSsbxFjV9k-psYujSR2YMtDOeZW_IDZS6eBlbRFc"};
 function startMapPractice(bank, cloud, student, initialPaperId, initialGrade) {
@@ -656,8 +664,10 @@ const filters = ["grade", "subject", "difficulty", "paper"];
 function renderSetup() {
   selection.grade = fillSelect(get("grade"), mapGradeOptions(bank.papers), selection.grade, "选择年级");
   const inGrade = bank.papers.filter(paper => String(paper.grade) === selection.grade);
-  const subjects = [...new Set(inGrade.map(paper => paper.subject))];
-  selection.subject = fillSelect(get("subject"), subjects.map(subject => [subject, subject]), selection.subject, "选择科目");
+  const subjects = new Set(inGrade.map(paper => paper.subject));
+  if (MAP_READING_SUPPLEMENTS.has(selection.grade)) subjects.add("Reading");
+  selection.subject = fillSelect(get("subject"), [...subjects].map(subject => [subject, subject]), selection.subject, "选择科目");
+  renderMapReadingResources(selection.grade, selection.subject);
   const inSubject = inGrade.filter(paper => paper.subject === selection.subject);
   const levels = ["Basic", "Proficient", "Advanced"].filter(level => inSubject.some(paper => paper.difficulty === level));
   selection.difficulty = fillSelect(get("difficulty"), levels.map(level => [level, level]), selection.difficulty, "选择难度");
@@ -673,7 +683,7 @@ function renderSetup() {
   if (!paper) {
     availableSets = [];
     get("selection-caption").textContent = selection.grade && !inGrade.length
-      ? `Grade ${selection.grade} 暂无题库，请选择已开放的年级。`
+      ? `Grade ${selection.grade} 暂无 MAP 原卷。`
       : "请选择年级、科目、难度和原卷。";
     button.textContent = "开始练习 →";
     return;
