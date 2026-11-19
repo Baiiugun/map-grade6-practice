@@ -92,14 +92,15 @@ function mapStudentCloud(classCode, student) {
     },
     async paper(id) {
       if (!loaded.has(id)) {
-        loaded.set(id, rpc("map_g6_get_paper", { p_paper_id: id }).catch(error => {
+        loaded.set(id, rpc("map_g6_get_paper", { p_paper_id: id }).then(result => {
+          if (!result?.paper) throw new Error("这份原卷还没有导入。");
+          return { ...result, paper: mapReadingChoiceNotation(result.paper) };
+        }).catch(error => {
           loaded.delete(id);
           throw error;
         }));
       }
-      const result = await loaded.get(id);
-      if (!result?.paper) throw new Error("这份原卷还没有导入。");
-      return result;
+      return loaded.get(id);
     },
     show(record) {
       visibleId = record?.id || null;

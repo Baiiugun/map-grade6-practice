@@ -276,10 +276,6 @@ if (linkedPaper) {
     source = swap(source, "`${paper.subject} · Grade ${paper.grade}`", "(chinese ? `${paper.display.subject} · ${paper.grade} 年级` : `${paper.subject} · Grade ${paper.grade}`)")
     source = swap(source, "`${paper.difficulty} · ${rangeLabel(questions)}", "`${chinese ? paper.display.difficulty : paper.difficulty} · ${rangeLabel(questions)}")
     source = swap(source, "`${paper.subject} · Grade ${paper.grade} · ${paper.difficulty}`", "(chinese ? `${paper.display.subject} · ${paper.grade} 年级 · ${paper.display.difficulty}` : `${paper.subject} · Grade ${paper.grade} · ${paper.difficulty}`)")
-    source = swap(source, "const letter = node(\"span\", \"option-letter\", label + \".\");", "const letter = node(\"span\", \"option-letter\", displayLabel(label) + \".\");")
-    source = swap(source, "我的答案 ${record.answers[question.id]}", "我的答案 ${displayLabel(record.answers[question.id])}")
-    source = swap(source, "for (const [, markup] of reference.options) options.append(setRich(node(\"li\"), markup));", "for (const [label, markup] of reference.options) {\n      const item = setRich(node(\"li\"), markup);\n      if (chinese) {\n        options.className = \"map-reference-options\";\n        item.prepend(document.createTextNode(displayLabel(label) + \"．\"));\n      }\n      options.append(item);\n    }")
-    source = swap(source, "function renderChoices(question) {", "function displayLabel(label) {\n  return chinese ? ({ A: \"甲\", B: \"乙\", C: \"丙\", D: \"丁\", E: \"戊\", F: \"己\" }[label] || label) : label;\n}\n\nfunction renderChoices(question) {")
     source = swap(source, '  element.innerHTML = markup;', '  element.innerHTML = markup;\n  if (chinese) {\n    for (const details of element.querySelectorAll("details.image-text")) details.open = true;\n  }')
     return "function startMapPractice(bank, cloud, student, initialPaperId, initialGrade, chinese) {\n" + source + "}\nmountMapStudent();"
 
@@ -294,9 +290,6 @@ def teacher_template():
 
 def teacher_script():
     source = read(SOURCE / "teacher.js")
-    source = swap(source, 'const letter = node("span", "option-letter", label);', 'const displayLabel = mapTeacherAnswerLabel(activePaper, label);\n    const letter = node("span", "option-letter", displayLabel);')
-    source = swap(source, 'letter.setAttribute("aria-label", label +', 'letter.setAttribute("aria-label", displayLabel +')
-    source = swap(source, 'question.key.join("、")', 'question.key.map(label => mapTeacherAnswerLabel(activePaper, label)).join("、")')
     source = swap(source, "function titleFor(paper) {", 'function titleFor(paper) {\n  if (paper.locale === "zh-CN") return `${paper.display.domain} · ${paper.display.kind} ${paper.number}（中文版）`;')
     source = swap(source, 'const bank = JSON.parse(document.getElementById("practice-bank").textContent);\n', "")
     source = swap(source, "    activePaper = paper;\n    location.hash = paper.id;", "    onPaperChange();\n    activePaper = paper;\n    location.hash = paper.id;")

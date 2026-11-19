@@ -67,3 +67,53 @@ async function mapPublicRpc(name, args, keepalive = false) {
   }
   return response.json();
 }
+
+// Restore notation in translations already stored in the question bank.
+function mapReadingChoiceNotation(paper) {
+  if (paper?.locale !== "zh-CN") return paper;
+
+  const letters = "甲乙丙丁";
+  const restoreLetters = text => text.replace(/[甲乙丙丁]/g, label => "ABCD"[letters.indexOf(label)]);
+  const items = /(<br\s*\/?>)([甲乙丙丁戊])[、．.]/g;
+  const restoreRoman = label => ["i", "ii", "iii", "iv", "v"]["甲乙丙丁戊".indexOf(label)];
+  const before = /(?:^|[，。、；：:“‘「（(→✓\s]|(?:选项|答案(?:字母)?(?:标为|是|为)?|支持|对应|选择|选的是|选|排除|对比|比较|不是|已知|认为|觉得|以为|肯定|还有|分别为|不如|比|按)\s*)/;
+  const labels = /[甲乙丙丁](?:[、和或与][甲乙丙丁])*/;
+  const after = /(?=$|项|选项|[，。；、：“‘”’」）)（(！？?!…\s]|都|也|更|较|最|只|没|是|把|正确|不|很|能|看|先|错|三个|三项|两项|判分|全|明确|提示|直接|中|里|讲|写)/;
+  const references = new RegExp("(" + before.source + ")(" + labels.source + ")" + after.source, "g");
+
+  return {
+    ...paper,
+    questions: paper.questions.map(question => {
+      const { stem, options } = question;
+      const isRhymeScheme = stem.includes("押韵") && options.every(([, text]) => /^[甲乙丙丁]{4}$/.test(text));
+      const hasRomanItems = Array.from(stem.matchAll(items), match => match[2]).join("") === "甲乙丙丁戊";
+      const restoreScheme = text => isRhymeScheme
+        ? text.replace(/[甲乙丙丁]{2,}|(?<=从)[甲乙丙丁](?=开始)/g, restoreLetters)
+        : text;
+      const display = {
+        ...question,
+        stem: hasRomanItems ? stem.replace(items, (_, br, label) => br + restoreRoman(label) + ". ") : stem,
+        options: options.map(([label, text]) => [
+          label,
+          hasRomanItems && /^[甲乙丙丁戊](?:[、和或与][甲乙丙丁戊])+$/.test(text)
+            ? text.replace(/[甲乙丙丁戊]/g, restoreRoman)
+            : restoreScheme(text),
+        ]),
+      };
+      if (typeof question.explanation !== "string") return display;
+      const restoreReferences = text => restoreScheme(text)
+        .replace(references, (_, prefix, marks) => prefix + restoreLetters(marks))
+        .replace(/[甲乙丙丁](?=项(?!目))/g, restoreLetters);
+      display.explanation = restoreReferences(question.explanation);
+      display.notes = question.notes.map(restoreReferences);
+      display.terms = question.terms.map(([text, role]) => [restoreScheme(text), role]);
+      if (question.skills) {
+        display.skills = Object.fromEntries(Object.entries(question.skills).map(([field, value]) => [
+          field,
+          field === "standard" ? value : Array.isArray(value) ? value.map(restoreReferences) : restoreReferences(value),
+        ]));
+      }
+      return display;
+    }),
+  };
+}

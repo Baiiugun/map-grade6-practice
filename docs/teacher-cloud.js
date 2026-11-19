@@ -4,11 +4,6 @@ const mapAttemptColumns = "id,paper_id,student,question_ids,answers,revision,sta
 const mapMarks = { correct: "正确", incorrect: "错误", unscored: "不计分", unanswered: "未答" };
 const mapClock = new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
 
-function mapTeacherAnswerLabel(paper, label) {
-  if (paper?.locale !== "zh-CN") return label;
-  return ({ A: "甲", B: "乙", C: "丙", D: "丁", E: "戊", F: "己" })[label] || label;
-}
-
 function mapReadBank(text) {
   const startTag = '<script id="practice-bank" type="application/json">';
   const start = text.indexOf(startTag);
@@ -89,7 +84,7 @@ async function mountMapTeacher() {
     if (!paperCache.has(id)) {
       paperCache.set(id, client.from("map_g6_papers").select("paper,images").eq("id", id).single().then(result => {
         if (result.error) throw result.error;
-        return result.data;
+        return { ...result.data, paper: mapReadingChoiceNotation(result.data.paper) };
       }).catch(error => {
         paperCache.delete(id);
         throw error;
@@ -124,7 +119,7 @@ async function mountMapTeacher() {
     const grading = record.grading?.[question.id];
     const result = grading?.mark || record.marks?.[index];
     const box = mapElement("div", "", "map-question-review");
-    box.append(mapElement("strong", record.student + " 原答 " + (mapTeacherAnswerLabel(papers.get(record.paper_id), record.answers[question.id]) || "未答")));
+    box.append(mapElement("strong", record.student + " 原答 " + (record.answers[question.id] || "未答")));
     if (result) box.append(mapElement("span", " · " + mapMarks[result]));
     if (grading?.note) box.append(mapElement("p", grading.note, "map-note"));
     if (record.submitted_at) box.append(mapButton(grading ? "修改批改" : "批改本题", () => showGrade(record, question)));

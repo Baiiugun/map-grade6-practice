@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-IQI5U6oFc6M9GNpkHBGtZbjdwwJcXyaB/NBUmYB5N9k=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-Ik5R+cWMtuORff4HaLagvH5ZV7moAMX9j934xKNEyp8=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
   <meta name="referrer" content="no-referrer">
-  <link rel="stylesheet" href="cloud.css?v=ed6cd707ee64">
+  <link rel="stylesheet" href="cloud.css?v=02e1bbf6dfc3">
   <title>MAP 在线练习</title>
   <style>:root {
   color-scheme: light;
@@ -533,8 +533,8 @@ dialog p { color: var(--muted); line-height: 1.6; }
     </form>
   </dialog>
   <noscript><p class="storage-notice">请在允许 JavaScript 的浏览器中打开此文件。</p></noscript>
-  <script src="cloud.js?v=07b0eb7a44f7"></script>
-  <script src="student-cloud.js?v=b2e315155a15"></script>
+  <script src="cloud.js?v=32a48f92561d"></script>
+  <script src="student-cloud.js?v=beebe4dfea00"></script>
   <script>"use strict";
 const MAP_CONFIG = {"url": "https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiZXhwIjozNjg2OTI1NzYzfQ.y45vSsbxFjV9k-psYujSR2YMtDOeZW_IDZS6eBlbRFc"};
 function startMapPractice(bank, cloud, student, initialPaperId, initialGrade, chinese) {
@@ -872,21 +872,10 @@ function renderReferences(question) {
     }
     const options = node("ol");
     options.type = "A";
-    for (const [label, markup] of reference.options) {
-      const item = setRich(node("li"), markup);
-      if (chinese) {
-        options.className = "map-reference-options";
-        item.prepend(document.createTextNode(displayLabel(label) + "．"));
-      }
-      options.append(item);
-    }
+    for (const [, markup] of reference.options) options.append(setRich(node("li"), markup));
     detail.append(options);
     holder.append(detail);
   }
-}
-
-function displayLabel(label) {
-  return chinese ? ({ A: "甲", B: "乙", C: "丙", D: "丁", E: "戊", F: "己" }[label] || label) : label;
 }
 
 function renderChoices(question) {
@@ -902,7 +891,7 @@ function renderChoices(question) {
     input.value = label;
     input.checked = chosen === label;
     input.disabled = reviewed || Boolean(record.submitRequested);
-    const letter = node("span", "option-letter", displayLabel(label) + ".");
+    const letter = node("span", "option-letter", label + ".");
     const body = setRich(node("div", "option-content rich"), markup);
     letter.id = `option-label-${optionIndex}`;
     body.id = `option-text-${optionIndex}`;
@@ -950,7 +939,7 @@ function renderQuiz() {
     feedback.className = "feedback " + status;
     if (status === "unanswered") feedback.textContent = "本题未作答";
     else if (status === "unscored") feedback.textContent = "本题不计分";
-    else feedback.textContent = `我的答案 ${displayLabel(record.answers[question.id])} · ${statusText[status]}`;
+    else feedback.textContent = `我的答案 ${record.answers[question.id]} · ${statusText[status]}`;
   }
   renderProgress();
   renderMaterials(question);
