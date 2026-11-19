@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-aqnp6hCfJtVog5ZNc5+97Sr6TIoFfAhOLg9N3iKTwuc=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-IQI5U6oFc6M9GNpkHBGtZbjdwwJcXyaB/NBUmYB5N9k=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
   <meta name="referrer" content="no-referrer">
-  <link rel="stylesheet" href="cloud.css?v=02e1bbf6dfc3">
+  <link rel="stylesheet" href="cloud.css?v=ed6cd707ee64">
   <title>MAP 在线练习</title>
   <style>:root {
   color-scheme: light;
@@ -401,6 +401,7 @@ dialog p { color: var(--muted); line-height: 1.6; }
   </header>
   <main>
 
+    <div class="map-toolbar"><button class="map-button" id="reading-mode" type="button">reading中文版</button></div>
     <section id="join-view" class="map-card map-gate" aria-labelledby="join-title">
       <p class="kicker">MAP · GRADE 1–12</p>
       <h1 id="join-title">进入在线练习</h1>
@@ -533,15 +534,15 @@ dialog p { color: var(--muted); line-height: 1.6; }
   </dialog>
   <noscript><p class="storage-notice">请在允许 JavaScript 的浏览器中打开此文件。</p></noscript>
   <script src="cloud.js?v=07b0eb7a44f7"></script>
-  <script src="student-cloud.js?v=bfe5c425d53b"></script>
+  <script src="student-cloud.js?v=b2e315155a15"></script>
   <script>"use strict";
 const MAP_CONFIG = {"url": "https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiZXhwIjozNjg2OTI1NzYzfQ.y45vSsbxFjV9k-psYujSR2YMtDOeZW_IDZS6eBlbRFc"};
-function startMapPractice(bank, cloud, student, initialPaperId, initialGrade) {
+function startMapPractice(bank, cloud, student, initialPaperId, initialGrade, chinese) {
 "use strict";
 
 const papers = new Map(bank.papers.map(paper => [paper.id, paper]));
 const get = id => document.getElementById(id);
-const prefix = `map-g6-v1:${cloud.classCode}:${student}:`;
+const prefix = `map-g6-v1:${cloud.classCode}:${student}:${chinese ? 'reading-zh:' : ''}`;
 const memory = new Map();
 const dateFormat = new Intl.DateTimeFormat("zh-CN", { dateStyle: "short", timeStyle: "short" });
 const statusText = { answered: "已答", unanswered: "未答", correct: "正确", incorrect: "错误", unscored: "不计分" };
@@ -628,6 +629,7 @@ function records() {
 }
 
 function paperTitle(paper) {
+  if (chinese) return `${paper.display.domain} · ${paper.display.kind} ${paper.number}`;
   const domain = paper.domain === "Comprehensive" ? "综合" : paper.domain;
   return `${domain} · ${paper.kind} ${paper.number}`;
 }
@@ -662,15 +664,17 @@ const selection = { subject: "", grade: "", difficulty: "", paper: "", size: "10
 const filters = ["grade", "subject", "difficulty", "paper"];
 
 function renderSetup() {
-  selection.grade = fillSelect(get("grade"), mapGradeOptions(bank.papers), selection.grade, "选择年级");
+  selection.grade = fillSelect(get("grade"), chinese
+    ? [...new Set(bank.papers.map(paper => String(paper.grade)))].sort((a, b) => a - b).map(value => [value, value + " 年级"])
+    : mapGradeOptions(bank.papers), selection.grade, "选择年级");
   const inGrade = bank.papers.filter(paper => String(paper.grade) === selection.grade);
   const subjects = new Set(inGrade.map(paper => paper.subject));
-  if (MAP_READING_SUPPLEMENTS.has(selection.grade)) subjects.add("Reading");
-  selection.subject = fillSelect(get("subject"), [...subjects].map(subject => [subject, subject]), selection.subject, "选择科目");
-  renderMapReadingResources(selection.grade, selection.subject);
+  if (!chinese && MAP_READING_SUPPLEMENTS.has(selection.grade)) subjects.add("Reading");
+  selection.subject = fillSelect(get("subject"), [...subjects].map(subject => [subject, chinese ? inGrade[0].display.subject : subject]), chinese ? "Reading" : selection.subject, "选择科目");
+  if (!chinese) renderMapReadingResources(selection.grade, selection.subject);
   const inSubject = inGrade.filter(paper => paper.subject === selection.subject);
   const levels = ["Basic", "Proficient", "Advanced"].filter(level => inSubject.some(paper => paper.difficulty === level));
-  selection.difficulty = fillSelect(get("difficulty"), levels.map(level => [level, level]), selection.difficulty, "选择难度");
+  selection.difficulty = fillSelect(get("difficulty"), levels.map(level => [level, chinese ? inSubject.find(paper => paper.difficulty === level).display.difficulty : level]), selection.difficulty, "选择难度");
   const inLevel = inSubject.filter(paper => paper.difficulty === selection.difficulty);
   selection.paper = fillSelect(get("paper"), inLevel.map(paper => [
     paper.id, `${paperTitle(paper)}（${paper.questions.length} 题）`,
@@ -753,7 +757,7 @@ async function openAttempt(record) {
   if (!questions.length) return;
   const index = record.submittedAt ? 0 : Math.max(0, Math.min(record.index || 0, questions.length - 1));
   active = { record, paper, questions, index };
-  get("quiz-crumb").textContent = `${paper.subject} · Grade ${paper.grade}`;
+  get("quiz-crumb").textContent = (chinese ? `${paper.display.subject} · ${paper.grade} 年级` : `${paper.subject} · Grade ${paper.grade}`);
   get("quiz-title").textContent = paperTitle(paper);
   setNumberGrid(true);
   get("instructions").hidden = !paper.instructions;
@@ -833,6 +837,9 @@ function renderProgress() {
 function setRich(element, markup) {
   // All fragments pass through the OCR exporter's allowlist at build time.
   element.innerHTML = markup;
+  if (chinese) {
+    for (const details of element.querySelectorAll("details.image-text")) details.open = true;
+  }
   for (const image of element.querySelectorAll("img[data-image]")) {
     image.src = bank.images[image.dataset.image];
   }
@@ -865,10 +872,21 @@ function renderReferences(question) {
     }
     const options = node("ol");
     options.type = "A";
-    for (const [, markup] of reference.options) options.append(setRich(node("li"), markup));
+    for (const [label, markup] of reference.options) {
+      const item = setRich(node("li"), markup);
+      if (chinese) {
+        options.className = "map-reference-options";
+        item.prepend(document.createTextNode(displayLabel(label) + "．"));
+      }
+      options.append(item);
+    }
     detail.append(options);
     holder.append(detail);
   }
+}
+
+function displayLabel(label) {
+  return chinese ? ({ A: "甲", B: "乙", C: "丙", D: "丁", E: "戊", F: "己" }[label] || label) : label;
 }
 
 function renderChoices(question) {
@@ -884,7 +902,7 @@ function renderChoices(question) {
     input.value = label;
     input.checked = chosen === label;
     input.disabled = reviewed || Boolean(record.submitRequested);
-    const letter = node("span", "option-letter", label + ".");
+    const letter = node("span", "option-letter", displayLabel(label) + ".");
     const body = setRich(node("div", "option-content rich"), markup);
     letter.id = `option-label-${optionIndex}`;
     body.id = `option-text-${optionIndex}`;
@@ -915,7 +933,7 @@ function renderQuiz() {
   const { record, paper, questions, index } = active;
   const reviewed = Boolean(record.submittedAt);
   const question = currentQuestion();
-  get("quiz-meta").textContent = `${paper.difficulty} · ${rangeLabel(questions)} · ${reviewed ? "结果回顾" : "练习中"}`;
+  get("quiz-meta").textContent = `${chinese ? paper.display.difficulty : paper.difficulty} · ${rangeLabel(questions)} · ${reviewed ? "结果回顾" : "练习中"}`;
   get("submit-quiz").hidden = reviewed;
   get("submit-quiz").disabled = finishing;
   get("submit-quiz").textContent = record.submitRequested ? "重试交卷" : "交卷";
@@ -932,7 +950,7 @@ function renderQuiz() {
     feedback.className = "feedback " + status;
     if (status === "unanswered") feedback.textContent = "本题未作答";
     else if (status === "unscored") feedback.textContent = "本题不计分";
-    else feedback.textContent = `我的答案 ${record.answers[question.id]} · ${statusText[status]}`;
+    else feedback.textContent = `我的答案 ${displayLabel(record.answers[question.id])} · ${statusText[status]}`;
   }
   renderProgress();
   renderMaterials(question);
@@ -1022,7 +1040,7 @@ function showHistory() {
     const paper = papers.get(record.paperId);
     const questions = attemptQuestions(record);
     const name = node("td");
-    name.append(node("span", "history-paper", paperTitle(paper)), node("span", "history-paper-meta", `${paper.subject} · Grade ${paper.grade} · ${paper.difficulty}`));
+    name.append(node("span", "history-paper", paperTitle(paper)), node("span", "history-paper-meta", (chinese ? `${paper.display.subject} · ${paper.grade} 年级 · ${paper.display.difficulty}` : `${paper.subject} · Grade ${paper.grade} · ${paper.difficulty}`)));
     const score = record.submittedAt ? tally(record) : null;
     const result = score ? `${score.correct} / ${score.total} · ${percent(score.correct, score.total)}` : `进行中 · ${Object.keys(record.answers).length} / ${questions.length}`;
     const action = node("td");
@@ -1094,7 +1112,9 @@ if (linkedPaper) {
     paper: linkedPaper.id,
     range: "0",
   });
-} else if (initialGrade && initialGrade !== selection.grade) {
+} else if (chinese && !bank.papers.some(paper => String(paper.grade) === selection.grade)) {
+  Object.assign(selection, { grade: String(bank.papers[0].grade), subject: "Reading" });
+} else if (!chinese && initialGrade && initialGrade !== selection.grade) {
   Object.assign(selection, { grade: initialGrade, subject: "", difficulty: "", paper: "", range: "0" });
   save("selection", selection);
 }

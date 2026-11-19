@@ -35,6 +35,7 @@ def replace_function(source, name, replacement):
 
 
 STUDENT_GATE = """
+    <div class="map-toolbar"><button class="map-button" id="reading-mode" type="button">reading中文版</button></div>
     <section id="join-view" class="map-card map-gate" aria-labelledby="join-title">
       <p class="kicker">MAP · GRADE 1–12</p>
       <h1 id="join-title">进入在线练习</h1>
@@ -160,7 +161,7 @@ def student_template():
 def student_script():
     source = read(SOURCE / "practice.js")
     source = swap(source, 'const bank = JSON.parse(document.getElementById("practice-bank").textContent);\nconst teacherEdition = bank.edition === "teacher";\n', "")
-    source = swap(source, "const prefix = `map-local-practice-v1:${bank.edition}:`;", "const prefix = `map-g6-v1:${cloud.classCode}:${student}:`;")
+    source = swap(source, "const prefix = `map-local-practice-v1:${bank.edition}:`;", "const prefix = `map-g6-v1:${cloud.classCode}:${student}:${chinese ? 'reading-zh:' : ''}`;")
     source = swap(source, "const encoder = new TextEncoder();\n", "")
     source = swap(source, 'const filters = ["subject", "grade", "difficulty", "paper"];', 'const filters = ["grade", "subject", "difficulty", "paper"];')
     source = swap(source, '''  const subjects = [...new Set(bank.papers.map(paper => paper.subject))];
@@ -168,12 +169,14 @@ def student_script():
   const inSubject = bank.papers.filter(paper => paper.subject === selection.subject);
   const grades = [...new Set(inSubject.map(paper => paper.grade))].sort((a, b) => a - b);
   selection.grade = fillSelect(get("grade"), grades.map(grade => [String(grade), `Grade ${grade}`]), selection.grade, "选择年级");
-  const inGrade = inSubject.filter(paper => String(paper.grade) === selection.grade);''', '''  selection.grade = fillSelect(get("grade"), mapGradeOptions(bank.papers), selection.grade, "选择年级");
+  const inGrade = inSubject.filter(paper => String(paper.grade) === selection.grade);''', '''  selection.grade = fillSelect(get("grade"), chinese
+    ? [...new Set(bank.papers.map(paper => String(paper.grade)))].sort((a, b) => a - b).map(value => [value, value + " 年级"])
+    : mapGradeOptions(bank.papers), selection.grade, "选择年级");
   const inGrade = bank.papers.filter(paper => String(paper.grade) === selection.grade);
   const subjects = new Set(inGrade.map(paper => paper.subject));
-  if (MAP_READING_SUPPLEMENTS.has(selection.grade)) subjects.add("Reading");
-  selection.subject = fillSelect(get("subject"), [...subjects].map(subject => [subject, subject]), selection.subject, "选择科目");
-  renderMapReadingResources(selection.grade, selection.subject);
+  if (!chinese && MAP_READING_SUPPLEMENTS.has(selection.grade)) subjects.add("Reading");
+  selection.subject = fillSelect(get("subject"), [...subjects].map(subject => [subject, chinese ? inGrade[0].display.subject : subject]), chinese ? "Reading" : selection.subject, "选择科目");
+  if (!chinese) renderMapReadingResources(selection.grade, selection.subject);
   const inSubject = inGrade.filter(paper => paper.subject === selection.subject);''')
     source = swap(source, '  const levels = ["Basic", "Proficient", "Advanced"].filter(level => inGrade.some', '  const levels = ["Basic", "Proficient", "Advanced"].filter(level => inSubject.some')
     source = swap(source, "  const inLevel = inGrade.filter(", "  const inLevel = inSubject.filter(")
@@ -262,11 +265,23 @@ if (linkedPaper) {
     paper: linkedPaper.id,
     range: "0",
   });
-} else if (initialGrade && initialGrade !== selection.grade) {
+} else if (chinese && !bank.papers.some(paper => String(paper.grade) === selection.grade)) {
+  Object.assign(selection, { grade: String(bank.papers[0].grade), subject: "Reading" });
+} else if (!chinese && initialGrade && initialGrade !== selection.grade) {
   Object.assign(selection, { grade: initialGrade, subject: "", difficulty: "", paper: "", range: "0" });
   save("selection", selection);
 }'''.strip())
-    return "function startMapPractice(bank, cloud, student, initialPaperId, initialGrade) {\n" + source + "}\nmountMapStudent();"
+    source = swap(source, "function paperTitle(paper) {", "function paperTitle(paper) {\n  if (chinese) return `${paper.display.domain} · ${paper.display.kind} ${paper.number}`;")
+    source = swap(source, "levels.map(level => [level, level])", "levels.map(level => [level, chinese ? inSubject.find(paper => paper.difficulty === level).display.difficulty : level])")
+    source = swap(source, "`${paper.subject} · Grade ${paper.grade}`", "(chinese ? `${paper.display.subject} · ${paper.grade} 年级` : `${paper.subject} · Grade ${paper.grade}`)")
+    source = swap(source, "`${paper.difficulty} · ${rangeLabel(questions)}", "`${chinese ? paper.display.difficulty : paper.difficulty} · ${rangeLabel(questions)}")
+    source = swap(source, "`${paper.subject} · Grade ${paper.grade} · ${paper.difficulty}`", "(chinese ? `${paper.display.subject} · ${paper.grade} 年级 · ${paper.display.difficulty}` : `${paper.subject} · Grade ${paper.grade} · ${paper.difficulty}`)")
+    source = swap(source, "const letter = node(\"span\", \"option-letter\", label + \".\");", "const letter = node(\"span\", \"option-letter\", displayLabel(label) + \".\");")
+    source = swap(source, "我的答案 ${record.answers[question.id]}", "我的答案 ${displayLabel(record.answers[question.id])}")
+    source = swap(source, "for (const [, markup] of reference.options) options.append(setRich(node(\"li\"), markup));", "for (const [label, markup] of reference.options) {\n      const item = setRich(node(\"li\"), markup);\n      if (chinese) {\n        options.className = \"map-reference-options\";\n        item.prepend(document.createTextNode(displayLabel(label) + \"．\"));\n      }\n      options.append(item);\n    }")
+    source = swap(source, "function renderChoices(question) {", "function displayLabel(label) {\n  return chinese ? ({ A: \"甲\", B: \"乙\", C: \"丙\", D: \"丁\", E: \"戊\", F: \"己\" }[label] || label) : label;\n}\n\nfunction renderChoices(question) {")
+    source = swap(source, '  element.innerHTML = markup;', '  element.innerHTML = markup;\n  if (chinese) {\n    for (const details of element.querySelectorAll("details.image-text")) details.open = true;\n  }')
+    return "function startMapPractice(bank, cloud, student, initialPaperId, initialGrade, chinese) {\n" + source + "}\nmountMapStudent();"
 
 
 def teacher_template():
@@ -279,9 +294,13 @@ def teacher_template():
 
 def teacher_script():
     source = read(SOURCE / "teacher.js")
+    source = swap(source, 'const letter = node("span", "option-letter", label);', 'const displayLabel = mapTeacherAnswerLabel(activePaper, label);\n    const letter = node("span", "option-letter", displayLabel);')
+    source = swap(source, 'letter.setAttribute("aria-label", label +', 'letter.setAttribute("aria-label", displayLabel +')
+    source = swap(source, 'question.key.join("、")', 'question.key.map(label => mapTeacherAnswerLabel(activePaper, label)).join("、")')
+    source = swap(source, "function titleFor(paper) {", 'function titleFor(paper) {\n  if (paper.locale === "zh-CN") return `${paper.display.domain} · ${paper.display.kind} ${paper.number}（中文版）`;')
     source = swap(source, 'const bank = JSON.parse(document.getElementById("practice-bank").textContent);\n', "")
     source = swap(source, "    activePaper = paper;\n    location.hash = paper.id;", "    onPaperChange();\n    activePaper = paper;\n    location.hash = paper.id;")
-    source = swap(source, '  row.append(stem, optionCell, explanation);', '  explanation.append(node("div", "map-overlay"));\n  row.append(stem, optionCell, explanation);')
+    source = swap(source, '  row.append(stem, optionCell, explanation', '  explanation.append(node("div", "map-overlay"));\n  row.append(stem, optionCell, explanation')
     source = swap(source, '  get("worksheet-rows").replaceChildren(sheet);', '  get("worksheet-rows").replaceChildren(sheet);\n  renderedPaper = paper;\n  refreshOverlay();')
     source = swap(source, '  get("instructions").hidden = !activePaper.instructions;\n  rich(get("instructions"), activePaper.instructions);\n  renderWorksheet(activePaper);', '  showWorksheet(activePaper.id);')
     source = swap(source, "  const subject = activePaper.subject;", '''  get("worksheet-grade").value = selectedGrade;

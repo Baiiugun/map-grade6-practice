@@ -143,6 +143,24 @@ async function mountMapStudent() {
   const savedKey = "map-g6-identity";
   const saved = mapReadLocal(savedKey) || {};
   const link = new URLSearchParams(location.hash.slice(1));
+  const url = new URL(location.href);
+  const linkedId = link.get("paper") || "";
+  const chinese = url.searchParams.get("reading") === "zh" || linkedId.endsWith(":zh-cn");
+  const toggle = get("reading-mode");
+  toggle.textContent = chinese ? "返回原版练习" : "reading中文版";
+  toggle.onclick = () => {
+    if (chinese) url.searchParams.delete("reading");
+    else url.searchParams.set("reading", "zh");
+    link.delete("paper");
+    if (code.value.trim()) link.set("class", code.value.trim());
+    url.hash = link.toString();
+    location.assign(url.href);
+  };
+  if (chinese) {
+    get("join-title").textContent = "进入中文阅读练习";
+    get("join-grade").closest("label").hidden = true;
+    document.querySelector("#join-view .kicker").textContent = "MAP · 中文阅读";
+  }
   const code = get("class-code");
   const name = get("student-name");
   const grade = get("join-grade");
@@ -168,18 +186,23 @@ async function mountMapStudent() {
     hint.textContent = "正在连接题库…";
     try {
       const cloud = mapStudentCloud(classCode, student);
-      const papers = await cloud.catalog();
+      const catalog = await cloud.catalog();
+      if (!catalog?.length) throw new Error(chinese ? "中文阅读题库尚未导入，请联系老师。" : "题库尚未导入，请联系老师。");
+      const papers = catalog.filter(paper => chinese
+        ? paper.locale === "zh-CN" && paper.subject === "Reading"
+        : paper.locale !== "zh-CN");
+      if (chinese && !papers.length) throw new Error("中文阅读题库尚未导入，请联系老师。");
       if (!papers?.length) throw new Error("题库尚未导入，请联系老师。");
       mapWriteLocal(savedKey, { code: classCode, name: student });
       get("join-view").hidden = true;
       get("practice-app").hidden = false;
       get("student-controls").hidden = false;
-      get("edition").textContent = student + " · 学生版";
+      get("edition").textContent = student + (chinese ? " · 中文阅读" : " · 学生版");
       get("change-student").onclick = () => {
         mapWriteLocal(savedKey, { code: classCode, name: "" });
         location.reload();
       };
-      startMapPractice({ papers, images: {} }, cloud, student, link.get("paper"), grade.value);
+      startMapPractice({ papers, images: {} }, cloud, student, linkedId, grade.value, chinese);
     } catch (error) {
       get("join-view").hidden = false;
       get("practice-app").hidden = true;

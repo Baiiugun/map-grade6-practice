@@ -76,3 +76,5 @@
   .site-header-inner { flex-wrap: wrap; }
   #student-controls { flex-basis: 100%; margin-left: 0; }
 }
+
+.map-reference-options { list-style: none; padding-inline-start: 0; }

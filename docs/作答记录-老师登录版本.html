@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-Sm2Ni7igcCM2xnySI1MiI/iT16t8vjEePjnEueZS68c=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-Hb+ehXaiLxSOCVCw+Y0g8dCda/QfeArG38Bzqv4b5hw=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
   <meta name="referrer" content="no-referrer">
-  <link rel="stylesheet" href="cloud.css?v=02e1bbf6dfc3">
+  <link rel="stylesheet" href="cloud.css?v=ed6cd707ee64">
   <title>MAP 作答记录 · 老师登录版本</title>
   <style>:root {
   color-scheme: light;
@@ -347,7 +347,7 @@ h1 { margin: 0; font-size: clamp(22px, 2.5vw, 31px); font-weight: 750; letter-sp
   <noscript><p>请在允许 JavaScript 的浏览器中打开此讲义。</p></noscript>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.89.0/dist/umd/supabase.js" integrity="sha384-sddcMIX7Ar6auuLM3TihDPYO6uOeMYsjtmZKfi8V83eeqdFWdnpAtk90odEwbXjh" crossorigin="anonymous"></script>
   <script src="cloud.js?v=07b0eb7a44f7"></script>
-  <script src="teacher-cloud.js?v=ddf953d820ab"></script>
+  <script src="teacher-cloud.js?v=1b01017ca467"></script>
   <script>"use strict";
 const MAP_CONFIG = {"url": "https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiZXhwIjozNjg2OTI1NzYzfQ.y45vSsbxFjV9k-psYujSR2YMtDOeZW_IDZS6eBlbRFc"};
 function startMapWorksheet(bank, loadPaper, overlay, onPaperChange) {
@@ -368,6 +368,7 @@ function node(tag, className = "", text = "") {
 }
 
 function titleFor(paper) {
+  if (paper.locale === "zh-CN") return `${paper.display.domain} · ${paper.display.kind} ${paper.number}（中文版）`;
   const domain = paper.domain === "Comprehensive" ? "综合" : paper.domain;
   return domain + " · " + paper.kind + " " + paper.number;
 }
@@ -488,8 +489,9 @@ function questionRow(question) {
   for (const [label, markup] of question.options) {
     const correct = question.key.includes(label);
     const option = node("li", correct ? "option correct" : "option");
-    const letter = node("span", "option-letter", label);
-    if (correct) letter.setAttribute("aria-label", label + "，参考答案");
+    const displayLabel = mapTeacherAnswerLabel(activePaper, label);
+    const letter = node("span", "option-letter", displayLabel);
+    if (correct) letter.setAttribute("aria-label", displayLabel + "，参考答案");
     option.append(letter, rich(node("div", "rich"), markup, rule));
     options.append(option);
   }
@@ -497,7 +499,7 @@ function questionRow(question) {
 
   const explanation = node("div", "cell explanation-cell");
   const answerText = question.key.length
-    ? (question.key.length === 1 ? "答案 " : "接受 ") + question.key.join("、")
+    ? (question.key.length === 1 ? "答案 " : "接受 ") + question.key.map(label => mapTeacherAnswerLabel(activePaper, label)).join("、")
     : "原题有争议";
   const answer = node("span", "answer-tag" + (question.key.length ? "" : " disputed"), answerText);
   const text = node("div", "explanation");
