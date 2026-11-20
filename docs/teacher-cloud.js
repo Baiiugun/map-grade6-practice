@@ -73,6 +73,7 @@ async function mountMapTeacher() {
   let realtime = null;
   let timer = null;
   let refreshSoon = null;
+  let stopReadingReport = null;
 
   function title(paper) {
     if (!paper) return "原卷";
@@ -238,6 +239,7 @@ async function mountMapTeacher() {
     workspace.hidden = false;
     status.textContent = "";
     get("teacher-who").textContent = session.user.email || "老师";
+    stopReadingReport = watchSupplementReport(client);
     try {
       const { data: settings, error: settingsError } = await client.from("map_g6_class").select("class_code").single();
       if (settingsError) throw settingsError;
@@ -381,6 +383,7 @@ async function mountMapTeacher() {
   client.auth.onAuthStateChange((event, session) => {
     if (event === "SIGNED_OUT" && sessionId && !session) {
       workspace.hidden = true;
+      stopReadingReport?.();
       clearInterval(timer);
       if (realtime) client.removeChannel(realtime);
       location.reload();

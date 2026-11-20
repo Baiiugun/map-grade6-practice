@@ -35,10 +35,18 @@ def replace_function(source, name, replacement):
 
 
 STUDENT_GATE = """
-    <div class="map-toolbar"><button class="map-button" id="reading-mode" type="button">reading中文版</button></div>
+    <section class="reading-entry map-card" aria-labelledby="supplement-title">
+      <h2 id="supplement-title">MAP 阅读补充练习</h2>
+      <nav class="edition-links" aria-label="选择阅读版本">
+        <a href="reading/supplement-zh.html">中文翻译版阅读练习 <span aria-hidden="true">→</span></a>
+        <a href="reading/supplement-en.html">英文原版阅读练习 <span aria-hidden="true">→</span></a>
+      </nav>
+      <a class="reading-teacher" href="作答记录-老师登录版本.html#supplement-report">老师查看阅读进度</a>
+    </section>
+    <div class="map-toolbar"><button class="map-button" id="reading-mode" type="button">Reading 中文原卷题库</button></div>
     <section id="join-view" class="map-card map-gate" aria-labelledby="join-title">
       <p class="kicker">MAP · GRADE 1–12</p>
-      <h1 id="join-title">进入在线练习</h1>
+      <h1 id="join-title">进入原卷题库</h1>
       <p class="map-muted">选择年级后，使用老师发来的链接或班级码进入题库。</p>
       <form id="join-form" class="map-form">
         <label>年级 <select id="join-grade"><option value="">进入题库后再选</option></select></label>
@@ -57,6 +65,8 @@ READING_RESOURCES = """      <section id="reading-resources" class="map-card" ar
         <div class="map-toolbar">
           <a class="map-button" href="reading/skills.html" target="_blank" rel="noopener">能力知识图谱（Grade 6）</a>
           <a class="map-button" id="reading-supplement" target="_blank" rel="noopener" hidden>补充阅读练习</a>
+          <a class="map-button" id="resource-zh" href="reading/supplement-zh.html" hidden>中文翻译版阅读练习</a>
+          <a class="map-button" id="resource-en" href="reading/supplement-en.html" hidden>英文原版阅读练习</a>
         </div>
         <p class="map-status" id="reading-supplement-status" role="status"></p>
       </section>
@@ -74,6 +84,19 @@ TEACHER_WORKSPACE = """
     </section>
     <p id="teacher-status" class="map-status" role="status"></p>
     <div id="teacher-workspace" hidden>
+      <section class="map-card" id="supplement-report" aria-labelledby="supplement-heading">
+        <h2 id="supplement-heading">补充阅读进度</h2>
+        <p class="map-muted">首次正确率按每道题的第一次作答计算。订正后，待订正题数会更新。</p>
+        <div class="map-toolbar">
+          <label>学生代号 <input type="search" id="supplement-filter" maxlength="40"></label>
+          <button type="button" class="map-button" id="supplement-refresh">刷新阅读进度</button>
+        </div>
+        <p id="supplement-status" class="map-status" role="status">正在读取阅读进度…</p>
+        <div class="map-table-wrap"><table class="map-table" id="supplement-table" hidden>
+          <thead><tr><th>学生</th><th>版本</th><th>已答 / 总题数</th><th>首次正确率</th><th>待订正</th><th>最近进度</th><th>最近活动时间</th></tr></thead>
+          <tbody id="supplement-rows"></tbody>
+        </table></div>
+      </section>
       <section class="map-card">
         <div class="map-toolbar">
           <strong id="teacher-who"></strong>
@@ -434,6 +457,8 @@ def build(filename, name, title, template, script, config):
             'integrity="sha384-sddcMIX7Ar6auuLM3TihDPYO6uOeMYsjtmZKfi8V83eeqdFWdnpAtk90odEwbXjh" crossorigin="anonymous"></script>\n'
         )
     loader += f'  <script src="{asset_url("cloud.js")}"></script>\n'
+    if teacher:
+        loader += f'  <script src="{asset_url("reading/supplement-report.js")}"></script>\n'
     loader += f'  <script src="{asset_url(name.replace("practice", "student") + "-cloud.js")}"></script>'
     template = swap(template, '  <script id="practice-bank" type="application/json">@@BANK@@</script>', loader)
     template = swap(template, "@@SCRIPT@@", script)
@@ -441,7 +466,8 @@ def build(filename, name, title, template, script, config):
 
 
 def reading_graph():
-    page = read(MAP_MATERIALS / "MAP_Reading_能力知识图谱.html")
+    source = MAP_MATERIALS / "MAP_能力知识图谱_Reading.html"
+    page = read(source if source.exists() else MAP_MATERIALS / "MAP_Reading_能力知识图谱.html")
     teacher_filename = "MAP_本地练习_老师版.html"
     teacher_url = quote(teacher_filename)
     markdown_url = quote("MAP_Reading_能力知识图谱.md")
@@ -497,14 +523,77 @@ def reading_grade_6():
     return swap(swap(swap(shell, "__STYLES__", css), "__DATA__", embedded), "__APP__", app)
 
 
+def supplement_page(source, config):
+    page = read(source)
+    # Replace the offline, same-browser report with the authenticated classroom page.
+    start = page.index("const files={en:")
+    end = page.index("function go(hash)", start)
+    page = page[:start] + page[end:]
+    asset = asset_url("reading/supplement-sync.js").removeprefix("reading/")
+    page = swap(page, "<script>", f'<script src="{asset}"></script>\n<script>')
+    page = swap(page, '<main id="content"', '<div class="wrap toolbar"><a href="../">← MAP</a>'
+                '<span id="supplement-sync" class="meta" role="status"></span></div>\n<main id="content"')
+    page = swap(page, "'supplement.reading.1/'", "'map-g6/supplement.reading.1/'")
+    page = swap(page, "const alias=()=>get('alias','本机学生');", """let tabStudent=get('alias','本机学生');
+try {
+ tabStudent=sessionStorage.getItem(NS+'alias')||tabStudent;
+ if(tabStudent!=='本机学生')sessionStorage.setItem(NS+'alias',tabStudent);
+} catch {}
+const alias=()=>tabStudent;""")
+    page = swap(page, "put('alias',name);closeAlias();", """tabStudent=name;put('alias',name);
+ try{sessionStorage.setItem(NS+'alias',name)}catch{}closeAlias();""")
+    page = swap(page, "const dateKey=", "const recordProgress=startSupplementSync("
+                + json.dumps(config) + ",BOOK,get,prefix);\nconst dateKey=")
+    page = swap(page, "put(prefix(rt.l)+'last-read',p.id);",
+                "put(prefix(rt.l)+'last-read',p.id);recordProgress(alias(),rt.l,{page:p.id,status:'reading',at:Date.now()});")
+    page = swap(page, "pos:run.idx+1,total:run.list.length,at:Date.now(),status});",
+                "pos:run.idx+1,total:run.list.length,at:Date.now(),status});\n"
+                " recordProgress(alias(),rt.l,get(prefix(rt.l)+'active'));")
+    page = swap(page, "const old=rt;rt=parse();", """const old=rt;rt=parse();
+ if(rt.v==='report'){location.replace('../作答记录-老师登录版本.html#supplement-report');return}
+ if(alias()==='本机学生'&&!['teacher','sources'].includes(rt.v)){
+  shell();app.replaceChildren();if(!$('#alias-box').open)showAlias();return;
+ }""")
+    page = swap(page, "const render={library,read,skills:skillPage,practice,result,teacher,sources,report};",
+                "const render={library,read,skills:skillPage,practice,result,teacher,sources};")
+    page = swap(page, " if(rt.v==='report')fetchPartner();\n", "")
+    page = swap(page, " if(t.id==='report-person'){reportPerson=t.value;refreshReport()}\n", "")
+    page = swap(page, "window.addEventListener('storage',()=>{if(rt.v==='report'&&!isBridge)refreshReport()});",
+                """$('#alias-box').addEventListener('close',()=>{
+ if(alias()==='本机学生'&&!['teacher','sources'].includes(rt.v))location.assign('../');
+});""")
+    page = swap(page, "  if(rt.v==='report'){refreshReport();if(channelToken)$('#progress-bridge')?.contentWindow?.postMessage({type:'supplement-read-progress',token:channelToken},postTarget())}\n", "")
+    page = swap(page, "const isBridge=location.hash==='#activity-bridge';\n", "")
+    page = swap(page, ",reportPerson='';", ";")
+    page = swap(page, "let otherRecords=null,bridgeRequested=false,channelToken='',bridgeTimer=0,lastRoute='';",
+                "let lastRoute='';")
+    page = swap(page, " if(isBridge)return;\n", "")
+    page = swap(page, "if(!isBridge){\n paint();", "paint();")
+    page = swap(page, "}else{document.body.hidden=true}", "")
+    page = swap(page, """const name=$('#alias-input').value.trim().slice(0,40)||'本机学生';""",
+                """const field=$('#alias-input'),name=field.value.trim().slice(0,40);
+ if(!name||name==='本机学生'){field.setCustomValidity(tr('请输入学生代号','Enter your student name or code'));field.reportValidity();return}
+ """)
+    page = swap(page, " if(ev.target.id==='find-reading')", " if(ev.target.id==='alias-input')ev.target.setCustomValidity('');\n if(ev.target.id==='find-reading')")
+    return page
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--map-materials", type=Path, help="MAP materials directory containing MAP_G6_OCR")
     parser.add_argument("--det-page", type=Path, required=True, help="Path to the existing DET wp.html")
     parser.add_argument("--student-only", action="store_true", help="Build the student entry and Reading resources.")
     args = parser.parse_args()
+    if args.map_materials:
+        MAP_MATERIALS = args.map_materials.resolve()
+        SOURCE = MAP_MATERIALS / "MAP_G6_OCR" / "practice_src"
+        READING_SOURCE = MAP_MATERIALS / "Reading-补充阅读及练习"
     config = public_config(args.det_page)
     student_page = (student_template(), student_script())
     reading_pages = {"skills.html": reading_graph(), "grade-6.html": reading_grade_6()}
+    supplement_dir = MAP_MATERIALS / "备课-Reading-阅读能力提升讲解"
+    for lang, filename in [("en", "07-补充阅读材料-英文原版.html"), ("zh", "08-补充阅读材料-中文翻译版.html")]:
+        reading_pages[f"supplement-{lang}.html"] = supplement_page(supplement_dir / filename, config)
     teacher_page = None if args.student_only else (teacher_template(), teacher_script())
 
     build("index.html", "practice", "MAP 在线练习", *student_page, config)

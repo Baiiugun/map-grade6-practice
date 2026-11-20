@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-1Y6gpnvG3N29aBuFMZurM1DajqBLX0u22TNJXzsNoN4=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
   <meta name="referrer" content="no-referrer">
-  <link rel="stylesheet" href="cloud.css?v=02e1bbf6dfc3">
+  <link rel="stylesheet" href="cloud.css?v=41149d477266">
   <title>MAP 作答记录 · 老师登录版本</title>
   <style>:root {
   color-scheme: light;
@@ -241,6 +241,19 @@ h1 { margin: 0; font-size: clamp(22px, 2.5vw, 31px); font-weight: 750; letter-sp
     </section>
     <p id="teacher-status" class="map-status" role="status"></p>
     <div id="teacher-workspace" hidden>
+      <section class="map-card" id="supplement-report" aria-labelledby="supplement-heading">
+        <h2 id="supplement-heading">补充阅读进度</h2>
+        <p class="map-muted">首次正确率按每道题的第一次作答计算。订正后，待订正题数会更新。</p>
+        <div class="map-toolbar">
+          <label>学生代号 <input type="search" id="supplement-filter" maxlength="40"></label>
+          <button type="button" class="map-button" id="supplement-refresh">刷新阅读进度</button>
+        </div>
+        <p id="supplement-status" class="map-status" role="status">正在读取阅读进度…</p>
+        <div class="map-table-wrap"><table class="map-table" id="supplement-table" hidden>
+          <thead><tr><th>学生</th><th>版本</th><th>已答 / 总题数</th><th>首次正确率</th><th>待订正</th><th>最近进度</th><th>最近活动时间</th></tr></thead>
+          <tbody id="supplement-rows"></tbody>
+        </table></div>
+      </section>
       <section class="map-card">
         <div class="map-toolbar">
           <strong id="teacher-who"></strong>
@@ -347,7 +360,8 @@ h1 { margin: 0; font-size: clamp(22px, 2.5vw, 31px); font-weight: 750; letter-sp
   <noscript><p>请在允许 JavaScript 的浏览器中打开此讲义。</p></noscript>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.89.0/dist/umd/supabase.js" integrity="sha384-sddcMIX7Ar6auuLM3TihDPYO6uOeMYsjtmZKfi8V83eeqdFWdnpAtk90odEwbXjh" crossorigin="anonymous"></script>
   <script src="cloud.js?v=32a48f92561d"></script>
-  <script src="teacher-cloud.js?v=41f8e87b6511"></script>
+  <script src="reading/supplement-report.js?v=936b52f62ca8"></script>
+  <script src="teacher-cloud.js?v=cfe197c8871b"></script>
   <script>"use strict";
 const MAP_CONFIG = {"url": "https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiZXhwIjozNjg2OTI1NzYzfQ.y45vSsbxFjV9k-psYujSR2YMtDOeZW_IDZS6eBlbRFc"};
 function startMapWorksheet(bank, loadPaper, overlay, onPaperChange) {

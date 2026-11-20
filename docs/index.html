@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27; &#x27;sha256-Ik5R+cWMtuORff4HaLagvH5ZV7moAMX9j934xKNEyp8=&#x27; https://cdn.jsdelivr.net; connect-src https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com wss://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data:; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
   <meta name="referrer" content="no-referrer">
-  <link rel="stylesheet" href="cloud.css?v=02e1bbf6dfc3">
+  <link rel="stylesheet" href="cloud.css?v=41149d477266">
   <title>MAP 在线练习</title>
   <style>:root {
   color-scheme: light;
@@ -401,10 +401,18 @@ dialog p { color: var(--muted); line-height: 1.6; }
   </header>
   <main>
 
-    <div class="map-toolbar"><button class="map-button" id="reading-mode" type="button">reading中文版</button></div>
+    <section class="reading-entry map-card" aria-labelledby="supplement-title">
+      <h2 id="supplement-title">MAP 阅读补充练习</h2>
+      <nav class="edition-links" aria-label="选择阅读版本">
+        <a href="reading/supplement-zh.html">中文翻译版阅读练习 <span aria-hidden="true">→</span></a>
+        <a href="reading/supplement-en.html">英文原版阅读练习 <span aria-hidden="true">→</span></a>
+      </nav>
+      <a class="reading-teacher" href="作答记录-老师登录版本.html#supplement-report">老师查看阅读进度</a>
+    </section>
+    <div class="map-toolbar"><button class="map-button" id="reading-mode" type="button">Reading 中文原卷题库</button></div>
     <section id="join-view" class="map-card map-gate" aria-labelledby="join-title">
       <p class="kicker">MAP · GRADE 1–12</p>
-      <h1 id="join-title">进入在线练习</h1>
+      <h1 id="join-title">进入原卷题库</h1>
       <p class="map-muted">选择年级后，使用老师发来的链接或班级码进入题库。</p>
       <form id="join-form" class="map-form">
         <label>年级 <select id="join-grade"><option value="">进入题库后再选</option></select></label>
@@ -453,6 +461,8 @@ dialog p { color: var(--muted); line-height: 1.6; }
         <div class="map-toolbar">
           <a class="map-button" href="reading/skills.html" target="_blank" rel="noopener">能力知识图谱（Grade 6）</a>
           <a class="map-button" id="reading-supplement" target="_blank" rel="noopener" hidden>补充阅读练习</a>
+          <a class="map-button" id="resource-zh" href="reading/supplement-zh.html" hidden>中文翻译版阅读练习</a>
+          <a class="map-button" id="resource-en" href="reading/supplement-en.html" hidden>英文原版阅读练习</a>
         </div>
         <p class="map-status" id="reading-supplement-status" role="status"></p>
       </section>
@@ -533,8 +543,8 @@ dialog p { color: var(--muted); line-height: 1.6; }
     </form>
   </dialog>
   <noscript><p class="storage-notice">请在允许 JavaScript 的浏览器中打开此文件。</p></noscript>
-  <script src="cloud.js?v=32a48f92561d"></script>
-  <script src="student-cloud.js?v=beebe4dfea00"></script>
+  <script src="cloud.js?v=b0b70610317b"></script>
+  <script src="student-cloud.js?v=e4aa31213256"></script>
   <script>"use strict";
 const MAP_CONFIG = {"url": "https://br-cute-tahr-8eff7472.supabase.aidap-global.cn-beijing.volces.com", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiZXhwIjozNjg2OTI1NzYzfQ.y45vSsbxFjV9k-psYujSR2YMtDOeZW_IDZS6eBlbRFc"};
 function startMapPractice(bank, cloud, student, initialPaperId, initialGrade, chinese) {

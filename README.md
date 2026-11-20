@@ -3,6 +3,14 @@
 - [学生入口](https://baiiugun.github.io/map-grade6-practice/)
 - [作答记录与课堂讲义 · 老师登录版](https://baiiugun.github.io/map-grade6-practice/作答记录-老师登录版本.html)
 
+## MAP 六年级阅读补充
+
+首页提供[中文翻译版阅读练习](https://baiiugun.github.io/map-grade6-practice/reading/supplement-zh.html)与[英文原版阅读练习](https://baiiugun.github.io/map-grade6-practice/reading/supplement-en.html)。学生首次进入填写老师能识别的代号。全班每人使用不同代号，同一学生两种版本、不同设备使用同一代号。两版均有 75 篇阅读材料，中文可练 224 题，英文可练 264 题。
+
+老师登录原有教师页后，在「补充阅读进度」按学生和版本查看已答题数、首次正确率、待订正数、最近篇目和专项位置。每道题只计一次首次作答。学生端网络中断时保留待同步记录，在原浏览器重新打开练习会自动补传。课堂进度每 10 秒刷新，也可以手动刷新。
+
+网页通过已有 `student_save` 接口保存进度，按版本使用随机记录标识和随机持有人标识，老师凭已有 Supabase 账号读取 `submissions` 中的 `MAP-G6-Reading-Supplement`。本功能沿用现有数据库结构。构建时从备课目录「备课-Reading-阅读能力提升讲解」读取 07 英文与 08 中文 HTML，并接入云端进度。
+
 ## 首次启用
 
 1. 登录 DET 使用的火山引擎 Supabase Studio。打开 **SQL Editor → New query**，粘贴 [setup.sql](setup.sql) 的全文，点 **Run**。看到成功提示后继续。
@@ -15,7 +23,7 @@
 
 ## Reading 中文版
 
-学生在首页点“reading中文版”进入中文阅读题库，可用原班级码和姓名缩写继续。选项沿用 A、B、C、D。两种语言分别保存作答记录。老师在原有“导入题库”入口选择私有的中文版老师题库 HTML，导入后即可分享指定中文卷。原图沿用，中文图文转录默认展开。题库文件保存在项目私有目录，发布目录只放网页代码。
+学生在首页点“Reading 中文原卷题库”进入中文阅读题库，可用原班级码和姓名缩写继续。选项沿用 A、B、C、D。两种语言分别保存作答记录。老师在原有“导入题库”入口选择私有的中文版老师题库 HTML，导入后即可分享指定中文卷。原图沿用，中文图文转录默认展开。题库文件保存在项目私有目录，发布目录只放网页代码。
 
 ## Reading 学习资源
 
@@ -33,8 +41,8 @@ Grade 6 的「补充阅读练习」直接打开《Spectrum Reading Grade 6》的
 
 GitHub Pages 从 `main` 的 `/docs` 发布页面。原网址和 Supabase 的 `map_g6_*` 表名沿用首次部署时的名称，以便已有链接和作答继续可用。题库由老师页读取本地讲义后逐卷导入。
 
-本地调整 MAP 页面模板后，在本项目目录运行 `python build.py --det-page "<DET 项目中的 wp.html 路径>"`，生成学生入口和老师入口。只重建学生入口和两份 Reading 页面时，在该命令后加 `--student-only`。在线逻辑位于 `docs/cloud.js`、`docs/student-cloud.js` 和 `docs/teacher-cloud.js`。
+本地调整 MAP 页面模板后，在本项目目录运行 `python build.py --det-page "<DET 项目中的 wp.html 路径>"`，生成学生入口和老师入口。若仓库独立存放，另传 `--map-materials "<备课-MAP-阅读-语法目录>"`。只重建学生入口和两份 Reading 页面时，在该命令后加 `--student-only`。在线逻辑位于 `docs/cloud.js`、`docs/student-cloud.js` 和 `docs/teacher-cloud.js`。
 
-Reading 的两份页面由 `build.py` 生成，发布在 `docs/reading/`。知识图谱读取备课目录中的 `MAP_Reading_能力知识图谱.html`，Grade 6 练习读取同目录下 `Reading-补充阅读及练习` 的 `src/` 与 `data/reading6.json`。在线版使用可作答题和解析，原书配套题档案可在本地源项目查看。接手与历次验证在补充练习源项目的《当前进度.md》。
+Reading 的两份页面由 `build.py` 生成，发布在 `docs/reading/`。知识图谱读取备课目录中的 `MAP_能力知识图谱_Reading.html`，Grade 6 练习读取同目录下 `Reading-补充阅读及练习` 的 `src/` 与 `data/reading6.json`。在线版使用可作答题和解析，原书配套题档案可在本地源项目查看。接手与历次验证在补充练习源项目的《当前进度.md》。
 
 新增年级时，先生成该年级的学生练习页并验证直达能力选择，再在 `docs/student-cloud.js` 的 `MAP_READING_SUPPLEMENTS` 登记该年级与实际页面路由，重建并验证学生入口。原卷与补充练习使用各自的入口，Grade 7 对应 Grade 7 的材料。

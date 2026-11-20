@@ -11,9 +11,10 @@ function renderMapReadingResources(grade, subject) {
 
   document.getElementById("reading-resources").hidden = !visible;
   link.hidden = !route;
+  for (const id of ["resource-zh", "resource-en"]) document.getElementById(id).hidden = !visible || grade !== "6";
   if (route) {
     link.href = route;
-    link.textContent = "Grade " + grade + " 补充阅读练习";
+    link.textContent = "Grade " + grade + " 原有专项练习";
   } else {
     link.removeAttribute("href");
   }
@@ -148,7 +149,7 @@ async function mountMapStudent() {
   const linkedId = link.get("paper") || "";
   const chinese = url.searchParams.get("reading") === "zh" || linkedId.endsWith(":zh-cn");
   const toggle = get("reading-mode");
-  toggle.textContent = chinese ? "返回原版练习" : "reading中文版";
+  toggle.textContent = chinese ? "返回英文原卷题库" : "Reading 中文原卷题库";
   toggle.onclick = () => {
     if (chinese) url.searchParams.delete("reading");
     else url.searchParams.set("reading", "zh");
@@ -158,7 +159,7 @@ async function mountMapStudent() {
     location.assign(url.href);
   };
   if (chinese) {
-    get("join-title").textContent = "进入中文阅读练习";
+    get("join-title").textContent = "进入中文阅读原卷题库";
     get("join-grade").closest("label").hidden = true;
     document.querySelector("#join-view .kicker").textContent = "MAP · 中文阅读";
   }
