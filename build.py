@@ -93,9 +93,14 @@ TEACHER_WORKSPACE = """
         </div>
         <p id="supplement-status" class="map-status" role="status">正在读取阅读进度…</p>
         <div class="map-table-wrap"><table class="map-table" id="supplement-table" hidden>
-          <thead><tr><th>学生</th><th>版本</th><th>已答 / 总题数</th><th>首次正确率</th><th>待订正</th><th>最近进度</th><th>最近活动时间</th></tr></thead>
+          <thead><tr><th>学生 / 详情</th><th>版本</th><th>已答 / 总题数</th><th>首次正确率</th><th>待订正</th><th>最近进度</th><th>最近活动时间</th></tr></thead>
           <tbody id="supplement-rows"></tbody>
         </table></div>
+        <section id="reading-detail" class="reading-detail" hidden aria-labelledby="reading-detail-title">
+          <h3 id="reading-detail-title" tabindex="-1">学生阅读详情</h3>
+          <label>查看题目 <select id="reading-detail-question"></select></label>
+          <div id="reading-detail-content"></div>
+        </section>
       </section>
       <section class="map-card">
         <div class="map-toolbar">
@@ -440,9 +445,10 @@ def build(filename, name, title, template, script, config):
     script = '"use strict";\nconst MAP_CONFIG = ' + json.dumps(config) + ";\n" + script
     digest = base64.b64encode(hashlib.sha256(script.encode("utf-8")).digest()).decode("ascii")
     teacher = name == "teacher"
+    report_origin = "'self' " if teacher else ""
     csp = (
         f"default-src 'none'; script-src 'self' 'sha256-{digest}' https://cdn.jsdelivr.net; "
-        f"connect-src {config['url']} {config['url'].replace('https:', 'wss:', 1)}; "
+        f"connect-src {report_origin}{config['url']} {config['url'].replace('https:', 'wss:', 1)}; "
         "style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'"
     )
     head = f'  <meta http-equiv="Content-Security-Policy" content="{html.escape(csp, quote=True)}">\n'
@@ -547,8 +553,19 @@ const alias=()=>tabStudent;""")
     page = swap(page, "put(prefix(rt.l)+'last-read',p.id);",
                 "put(prefix(rt.l)+'last-read',p.id);recordProgress(alias(),rt.l,{page:p.id,status:'reading',at:Date.now()});")
     page = swap(page, "pos:run.idx+1,total:run.list.length,at:Date.now(),status});",
-                "pos:run.idx+1,total:run.list.length,at:Date.now(),status});\n"
+                "pos:run.idx+1,total:run.list.length,page:run.q.pages.includes(presentedPage)?presentedPage:run.q.pages[0],at:Date.now(),status});\n"
                 " recordProgress(alias(),rt.l,get(prefix(rt.l)+'active'));")
+    page = swap(page, "s.choice=Number(t.value);put(qkey(run.q),s);",
+                "s.choice=Number(t.value);put(qkey(run.q),s);markActive(run,'working');")
+    page = swap(page, "lastRoute=location.hash;shell();",
+                "lastRoute=location.hash;shell();\n"
+                " if(['skills','library'].includes(rt.v))recordProgress(alias(),rt.l,{status:'selecting',at:Date.now()});")
+    page = swap(page, "presentedPage=target.dataset.page;highlight=target.dataset.key;",
+                "presentedPage=target.dataset.page;highlight=target.dataset.key;\n"
+                "  if(rt.v==='practice'){const run=currentRun();if(run)markActive(run,counts(run).done===run.list.length?'finished':'working')}")
+    page = swap(page, "  if(rt.v==='practice'){const r=currentRun();if(r)markActive",
+                "  if(rt.v==='read')recordProgress(alias(),rt.l,{page:currentPage().id,status:'reading',at:Date.now()});\n"
+                "  if(rt.v==='practice'){const r=currentRun();if(r)markActive")
     page = swap(page, "const old=rt;rt=parse();", """const old=rt;rt=parse();
  if(rt.v==='report'){location.replace('../作答记录-老师登录版本.html#supplement-report');return}
  if(alias()==='本机学生'&&!['teacher','sources'].includes(rt.v)){

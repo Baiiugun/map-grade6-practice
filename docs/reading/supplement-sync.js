@@ -28,16 +28,22 @@ function startSupplementSync(config, book, read, keysFor) {
       }
       const prefix = keysFor(lang, student);
       const answered = {};
+      const choices = {};
       for (const q of book.questions) {
         if (lang === "zh" && q.skill.startsWith("C")) continue;
         const tries = read(prefix + "q/" + q.id)?.tries;
         if (!tries?.length) continue;
         const first = tries[0], last = tries[tries.length - 1];
         answered[q.id] = [first.at, first.i === q.key, last.at, last.i === q.key];
+        choices[q.id] = [first.i, last.i];
       }
       const q = questions.get(activity.qid);
-      const passage = q?.pages.map(id => titles.get(id)).join(" / ") || titles.get(activity.page) || "";
-      const answers = { student, lang, total: totals[lang], answered, passage,
+      const page = activity.page || q?.pages[0] || null;
+      const current = q ? read(prefix + "q/" + q.id) : null;
+      const submitted = Boolean(current?.tries?.length && !current.retry);
+      const answers = { student, lang, total: totals[lang], answered, choices, page,
+        qid: q?.id || null, passage: titles.get(page) || "", submitted,
+        choice: submitted ? current.tries.at(-1).i : current?.choice ?? null,
         skill: activity.skill || "", pos: activity.pos || 0, count: activity.total || 0,
         state: activity.status, at: activity.at };
       const row = { ...owner, task_type: task, set_num: lang === "zh" ? 1 : 2,
